@@ -1,0 +1,228 @@
+/**
+ * General elements
+ *
+ */
+ @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700);
+@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900);
+
+
+html{ margin:0;													/* Common margin & padding for all browsers */
+		padding:0;
+		overflow-y:scroll;										/*Always display the scrollbar, avoid flipping pages */
+		background: #B7B69C; /* #FFFFFF;
+/*		background-image:url('../img/bgtexture.jpg'); */	/* Background texture for whole browser window */ 
+/*		background-repeat:repeat;							*/	
+}
+
+body {
+  color: #333;
+  font-family: 'Open Sans', sans-serif;
+}
+
+
+/**
+ * Layout of the main page elements
+ */
+#wrapper {
+  margin: 0 auto;
+  width: 980px;
+  padding: 10px;
+}
+
+
+/**
+ * Layout for header
+ */
+#header {
+  position: relative;
+  margin-bottom: 20px;
+}
+.sitelogo {
+	padding-top: 1em;
+	padding-left: 2em;
+	width: 70px;
+
+}
+.sitetitle {
+  position: absolute;
+  top: 6px;
+  left: 130px;
+  font-size: 48px;
+}
+
+.siteslogan {
+  position: absolute;
+  top: 65px;
+  left: 130px;
+  font-style: italic;
+  color: #666;
+ /* margin-top: 20px; */
+}
+
+
+ /**
+ *Layout for navbar
+ */
+#navbar li {
+    display: inline;
+}
+
+#navbar a {
+	 border-radius: 5px;
+    background-color:#E5E000;
+    color:#666;
+    padding:10px;
+    text-decoration:none;
+}
+
+#navbar a:hover {
+    background-color:#FFB55D;
+	 border-radius: 5px;
+    padding: 0.7em;
+}
+
+#navbar a:focus {
+    outline: 0;
+}
+
+#navbar li.selected a{
+   /* border:3px solid #19140E; */
+    border-bottom: none;
+    border-radius: 5px;
+    background-color:#B7B69C;
+    color:#666;
+}
+
+#login a {
+	 float: right;
+	 border-radius: 5px;
+    background-color:#E5E000;
+    color:#666;
+    padding:10px;
+    text-decoration:none;
+}
+
+
+/**
+ * Layout for main
+ */
+#main {
+  min-height: 20em;
+}
+
+
+/**
+ * Layout for footer
+ */
+#footer {
+  margin-top: 40px;
+  border-top: 1px solid #ccc;
+  padding-top: 15px;
+  clear: both;
+}
+
+#footer a {
+    color:#666;
+    padding:10px;
+    text-decoration:none;
+}
+
+.sitefooter {
+  color: #666;
+}
+
+/**
+ * Custom HTML tags for movie display.
+ *
+ */
+
+moviePriceStandard { color: red; }
+moviePriceSpecial { color: red; }
+movieTitle { font-size: 1.2em; }
+
+
+
+/**
+ * Site extras DiceGame, MovieDB, pageArrows, dropdownBoxes etc.
+ *
+ */
+ #gameButtons a {
+	 padding: 3px;
+	 margin-right: 1em;
+    color: #3C3C3C;
+    text-decoration: none;
+    border:3px solid #FF9A2A;
+}
+#gameButtons p {
+	 display: inline;
+	 list-style: none;
+    margin-top: 1em;
+}
+
+.pageArrows { text-align: center; }
+.pageArrows a:link {text-decoration: none;}
+
+.movieDBcolumn th {
+	border: 1px solid #E5E000;
+	border-bottom: 1px solid #2B2F54;
+	border-right: 1px solid #2B2F54;
+	border-radius: 5px;
+}
+.movieTitle, .movieTitle a:link {
+	font-size: 1.2em;
+	text-align: center;
+	text-decoration: none;
+	color: #2B2F54;
+}
+
+.movieDBpicture {
+	border: 1px solid #2B2F54;
+	border-radius: 5px;
+}
+
+.resultMovie {
+	width: 40%;
+	height: 400px;
+	border: 1px dashed #2B2F54;
+	border-radius: 8px;
+	padding: 2em;
+	float: left;
+	margin: 0em;
+	text-align: center;
+}
+
+.resultContent {
+	width: 40%;
+	height: 168px;
+	border: 1px dashed #2B2F54;
+	border-radius: 8px;
+	padding: 2em;
+	float: left;
+	margin: 0em;
+}
+
+.resultContentNews {
+	width: 80%;
+	height: ;
+	border: 1px dashed #2B2F54;
+	padding: 2em;
+	float: left;
+	margin: 0.5em;
+}
+
+.posts{
+	border: 1px dashed #2B2F54;
+	line-height: 2em;
+	float: right;
+	padding: 4em;
+}
+
+.left {	
+	float: left;
+	position: relative;
+}
+.right { 
+	float: right;
+	position: relative;
+			
+}

@@ -1,0 +1,1 @@
+Roo is a PHP-boilerplate/framework for small websites. Roo was built by Kai Weeks (kawe14@student.bth.se, with the help of Mikael Roos (me@mikaelroos.se) as part of teaching web programming.
