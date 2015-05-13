@@ -13,6 +13,11 @@ function myExceptionHandler($exception) {
 }
 set_exception_handler('myExceptionHandler');
 
+/**
+ * Another autoloader for classes.
+ *
+ */
+include(ROO_INSTALL_PATH . '/src/CForm/autoloader.php');
 
 /**
  * Autoloader for classes.
@@ -31,11 +36,7 @@ function myAutoloader($class) {
 spl_autoload_register('myAutoloader');
 
 
-/**
- * Another autoloader for classes.
- *
- */
-include(ROO_INSTALL_PATH . '/src/CForm/autoloader.php');
+
 
 
 

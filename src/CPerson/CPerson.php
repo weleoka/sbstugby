@@ -4,8 +4,6 @@
 /**
  * CPerson, class that represents person.
  */
-
-
 class CPerson {
 
   /*
@@ -25,9 +23,9 @@ class CPerson {
      */
      public function getAll () {
         $sql = "SELECT * FROM {$this->tableNames['person']}";
-        $result = $this->db->ExecuteSelectQueryAndFetchAll($sql);
-        dump($result);
-        return $result;
+        $results = $this->db->ExecuteSelectQueryAndFetchAll($sql);
+        // dump($results);
+        return $results;
      }
 /*
     foreach ($tags as $tag) {

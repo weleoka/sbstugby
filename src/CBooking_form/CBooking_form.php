@@ -14,7 +14,7 @@ class CBooking_form {
     public function __construct($dbCredentials, $tableNames) {
             $this->db = new CDatabase($dbCredentials);
             $this->tableNames = $tableNames;
-            $this->form = new CForm();
+            $this->form = new \Mos\HTMLForm\CForm();
             $this->person = new CPerson($dbCredentials, $tableNames);
             $this->invoice = new CInvoice($dbCredentials, $tableNames);
     }
@@ -37,14 +37,14 @@ class CBooking_form {
      */
     public function makeForm ($category) {
         if ($category = 1) {
-            $formFields = makeCottageFormFields(1);
+            $formFields = $this->makeCottageFormFields(1);
         } else if ($category = 2) {
-            $formFields = makeBikeFormFields(2);
+            $formFields = $this->makeBikeFormFields(2);
         } else if ($category = 3) {
-            $formFields = makeSkiiFormFields(3);
+            $formFields = $this->makeSkiiFormFields(3);
         }
 
-        $form = $form->create([], $formFields);
+        $form = $this->form->create([], $formFields);
 
         // Check the status of the form.
         $status = $form->check();
@@ -65,10 +65,19 @@ class CBooking_form {
      */
     public function makeCottageFormFields ($categoryCode) {
         $form = $this->form;
-        $persons = $this->person->getAll();
+
         $invoices = $this->invoice->getAll();
-        $selectPersons = array($persons => $person);
-        $selectInvoices = array($invoices => $invoice);
+        foreach ($invoices as $invoice) {
+          $selectInvoices[ $invoice->id ] = $invoice->Betalperson_id;
+        }
+
+        $persons = $this->person->getAll();
+        foreach ($persons as $person) {
+          $selectPersons[ $person->id ] = $person->Namn;
+        }
+
+        // $selectPersons = array($persons => $person);
+        // $selectInvoices = array($invoices => $invoice);
 
         return [
             'invoice' => [
@@ -134,30 +143,41 @@ class CBooking_form {
                 'callback'  => function($form) use ($categoryCode){
 
                     $sql = "
-                        INSERT INTO {$this->tableName} (title, slug, url, data, type, filter, published, created)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+                        START TRANSACTION;
+                        INSERT INTO {$this->tableNames['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
+                        VALUES (?, ?, ?, $categoryCode);
+                        INSERT INTO {$this->tableNames['cottageBookings']} (Bokning_id, Stuga_id, person01, person02, person03, person04, person05, person06, person07, person08, )
+                        VALUES (?, ?, ?, $categoryCode);
+                        COMMIT;";
 
-                    $params = ([
-                        /* `Faktura_id` INT NULL ,
-                          `Kal_prislista_id` INT NOT NULL ,
-                          `Kal_period_id` INT NOT NULL ,
-                          `Bokning_typ_id` VARCHAR(255) NOT NULL */
-                            'invoice'           => $form->Value('invoice'),
-                            'period'            => $form->Value('period'),
-                            'cottage'          => $form->Value('cottage'),
-                            'person01'       => $form->Value('person01'),
-                            'person02'       => $form->Value('person02'),
-                            'person03'       => $form->Value('person03'),
-                            'person04'       => $form->Value('person04'),
-                            'person05'       => $form->Value('person05'),
-                            'person06'       => $form->Value('person06'),
-                            'person07'       => $form->Value('person07'),
-                            'person08'       => $form->Value('person08'),
-                            'bookingType'  => $categoryCode,
-                            // 'timestamp'     => getTime(),
+                    $params = array ([
+                    /* `Faktura_id` INT NULL ,
+                      `Kal_prislista_id` INT NOT NULL ,
+                      `Kal_period_id` INT NOT NULL ,
+                      `Bokning_typ_id` VARCHAR(255) NOT NULL
+                      isset( $tag ) ? ''          : 'välj kategori: ', */
+
+                        'invoice'           => $form->Value('invoice'),
+                        'priceList'         => $form->Value('priceList'),
+                        'period'            => $form->Value('period'),
+                        // 'timestamp'     => getTime(),
+
+                     /* `Bokning_id` INT NOT NULL ,
+                      `Stuga_id` INT NULL ,
+                      `Person_01` INT NULL DEFAULT NULL */
+                        'last_insert_id'  => $this->db->getLastID(),
+                        'cottage'          => $form->Value('cottage'),
+                        'person01'       => $form->Value('person01'),
+                        'person02'       => $form->Value('person02'),
+                        'person03'       => $form->Value('person03'),
+                        'person04'       => $form->Value('person04'),
+                        'person05'       => $form->Value('person05'),
+                        'person06'       => $form->Value('person06'),
+                        'person07'       => $form->Value('person07'),
+                        'person08'       => $form->Value('person08'),
                     ]);
-                    $res = $this->db->ExecuteQuery($sql, $params);
 
+                    $res = $this->db->ExecuteQuery($sql, $params);
                     if($res) {
                         $output = 'Informationen sparades.';
                     } else {

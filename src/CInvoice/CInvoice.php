@@ -25,9 +25,10 @@ class CInvoice {
      */
      public function getAll () {
         $sql = "SELECT * FROM {$this->tableNames['invoices']}";
-        $result = $this->db->ExecuteSelectQueryAndFetchAll($sql);
-        dump($result);
-        return $result;
+        $results = $this->db->ExecuteSelectQueryAndFetchAll($sql);
+
+        // dump($results);
+        return $results;
      }
 /*
     foreach ($tags as $tag) {

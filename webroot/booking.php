@@ -26,9 +26,11 @@ $output = '';
 
 if (is_numeric($category)){
     $categoryStr = $bookings->getCategoryStr($category);
-    $form = new CBooking_form($roo['database'], $roo['tableNames'], $category);
+    $form = new CBooking_form($roo['database'], $roo['tableNames']);
     $form->makeForm($category);
     $formStr = $form->getHTML();
+    print($formStr);
+    // dump($formStr);
 } else {
     $formStr = "no category found matching the criteria.";
 }
@@ -50,17 +52,12 @@ if(isset($_POST['save'])) {
 
 }
 
-// <p><label>Type:<br/><input type='text' name='type' value='{$type}'/></label></p>
-
-$roo['header'] .= '<span class="siteslogan">Create Article!</span>';
+$roo['header'] .= '<span class="siteslogan">' . $categoryStr . '!</span>';
 
 $roo['main'] = <<<EOD
 <article>
     <h1>{$categoryStr}</h1>
-
     {$formStr}
-
-
 </article>
 EOD;
 
