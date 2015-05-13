@@ -106,7 +106,8 @@ $roo['navbar'] = array(
  * Settings for the database.
  *
  */
-$roo['database']['dsn']      = 'mysql:host=localhost;dbname=mydb;'; 	// 'mysql:host=blu-ray.student.bth.se;dbname=kawe14;';
+$roo['database']['dbname']      = 'mydb.';                                                   // Used in some query builders NOTE: the full stop!
+$roo['database']['dsn']      	 = 'mysql:host=localhost;dbname=mydb;'; 	// 'mysql:host=blu-ray.student.bth.se;dbname=kawe14;';
 $roo['database']['username']    = 'root';					// kawe14
 $roo['database']['password']    = 'enter112';					// 4pido7X]
 $roo['database']['driver_options'] = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'");

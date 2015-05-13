@@ -29,12 +29,11 @@ if (is_numeric($category)){
     $form = new CBooking_form($roo['database'], $roo['tableNames']);
     $form->makeForm($category);
     $formStr = $form->getHTML();
-    print($formStr);
     // dump($formStr);
 } else {
+    $categoryStr = "No category booking.";
     $formStr = "no category found matching the criteria.";
 }
-
 
 if(isset($_POST['save'])) {
 
@@ -57,6 +56,7 @@ $roo['header'] .= '<span class="siteslogan">' . $categoryStr . '!</span>';
 $roo['main'] = <<<EOD
 <article>
     <h1>{$categoryStr}</h1>
+    Skapa ny betalperson?
     {$formStr}
 </article>
 EOD;

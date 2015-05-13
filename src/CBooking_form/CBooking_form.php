@@ -17,6 +17,8 @@ class CBooking_form {
             $this->form = new \Mos\HTMLForm\CForm();
             $this->person = new CPerson($dbCredentials, $tableNames);
             $this->invoice = new CInvoice($dbCredentials, $tableNames);
+            $this->booking = new CBookings($dbCredentials, $tableNames);
+            $this->period = new CPeriod($dbCredentials, $tableNames);
     }
 
     /*
@@ -25,7 +27,7 @@ class CBooking_form {
      * @return string with html to display content
      */
     public function getHTML () {
-        $this->form->getHTML();
+        return $this->form->getHTML();
     }
 
 
@@ -68,7 +70,7 @@ class CBooking_form {
 
         $invoices = $this->invoice->getAll();
         foreach ($invoices as $invoice) {
-          $selectInvoices[ $invoice->id ] = $invoice->Betalperson_id;
+          $selectInvoices[ $invoice->id ] = $invoice->namn;
         }
 
         $persons = $this->person->getAll();
@@ -76,8 +78,10 @@ class CBooking_form {
           $selectPersons[ $person->id ] = $person->Namn;
         }
 
-        // $selectPersons = array($persons => $person);
-        // $selectInvoices = array($invoices => $invoice);
+        $weeks = $this->period->getAllWeeks();
+        foreach ($weeks as $week) {
+          $selectWeeks[ $week->id ] = $week->id;
+        }
 
         return [
             'invoice' => [
@@ -86,16 +90,14 @@ class CBooking_form {
                         'options'  => $selectInvoices,
             ],
             'first_week' => [
-                'type'        => 'textarea',
-                'label'       => '',
-                'placeholder' => 'Skriv ett svar',
-                'validation'  => ['not_empty'],
+                        'type'      => 'select',
+                        'label'      => 'Välj startvecka: ',
+                        'options'  => $selectWeeks,
             ],
             'last_week' => [
-                'type'        => 'textarea',
-                'label'       => '',
-                'placeholder' => 'Skriv ett svar',
-                'validation'  => ['not_empty'],
+                        'type'      => 'select',
+                        'label'      => 'Välj slutvecka: ',
+                        'options'  => $selectWeeks,
             ],
             'person01' => [
                         'type'      => 'select',
@@ -140,32 +142,36 @@ class CBooking_form {
             'submit' => [
                 'type'      => 'submit',
                 'class'     => 'bigButton',
-                'callback'  => function($form) use ($categoryCode){
+                'callback'  => function($form) use ($categoryCode) {
 
-                    $sql = "
-                        START TRANSACTION;
-                        INSERT INTO {$this->tableNames['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
-                        VALUES (?, ?, ?, $categoryCode);
-                        INSERT INTO {$this->tableNames['cottageBookings']} (Bokning_id, Stuga_id, person01, person02, person03, person04, person05, person06, person07, person08, )
-                        VALUES (?, ?, ?, $categoryCode);
-                        COMMIT;";
+                    $sql = "START TRANSACTION;";
+                    $output = 'Started transaction: ';
 
-                    $params = array ([
+                    $periodParams = [
+                     /* isset( $tag ) ? ''          : 'välj kategori: ', */
+                        'first_week'      => $form->Value('first_week'),
+                        'last_week'       => $form->Value('last_week'),
+                    ];
+                    $output .= $this->period->insertNewPeriod($periodParams);
+
+                    $bookingParams = [
                     /* `Faktura_id` INT NULL ,
                       `Kal_prislista_id` INT NOT NULL ,
                       `Kal_period_id` INT NOT NULL ,
-                      `Bokning_typ_id` VARCHAR(255) NOT NULL
-                      isset( $tag ) ? ''          : 'välj kategori: ', */
-
+                      `Bokning_typ_id` VARCHAR(255) NOT NULL */
                         'invoice'           => $form->Value('invoice'),
                         'priceList'         => $form->Value('priceList'),
-                        'period'            => $form->Value('period'),
+                        'last_insert_period_id'  => $this->db->LastInsertId(),
+                        'category'         => $categoryCode,
                         // 'timestamp'     => getTime(),
+                    ];
+                    $output .= $this->booking->insertNewBooking($bookingParams);
 
+                    $cottageBookingParams = [
                      /* `Bokning_id` INT NOT NULL ,
                       `Stuga_id` INT NULL ,
                       `Person_01` INT NULL DEFAULT NULL */
-                        'last_insert_id'  => $this->db->getLastID(),
+                        'last_insert_booking_id'  => $this->db->LastInsertId(),
                         'cottage'          => $form->Value('cottage'),
                         'person01'       => $form->Value('person01'),
                         'person02'       => $form->Value('person02'),
@@ -175,13 +181,16 @@ class CBooking_form {
                         'person06'       => $form->Value('person06'),
                         'person07'       => $form->Value('person07'),
                         'person08'       => $form->Value('person08'),
-                    ]);
+                    ];
+                    $output .= $this->booking->insertNewCottageBooking($cottageBookingParams);
 
-                    $res = $this->db->ExecuteQuery($sql, $params);
+                    $sql = "COMMIT;";
+                    $res = $this->db->ExecuteQuery($sql);
+
                     if($res) {
-                        $output = 'Informationen sparades.';
+                        $output .= 'Informationen sparades.';
                     } else {
-                        $output = 'Informationen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
+                        $output .= 'Informationen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
                     }
                     return $output;
                 }

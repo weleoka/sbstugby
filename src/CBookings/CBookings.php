@@ -16,8 +16,11 @@ class CBookings {
    */
     public function __construct($dbCredentials, $tableNames) {
         $this->db = new CDatabase($dbCredentials);
+        $this->SQLBuilder = new CSQLQueryBuilderBasic();
+        $this->SQLBuilder->setTablePrefix($dbCredentials['dbname']);
         $this->tableNames = $tableNames;
     }
+
 
 
     /*
@@ -56,8 +59,8 @@ class CBookings {
      *
      * @return string with html to display content
      */
-	public function getAllBookings($category) {
-        $sql = "SELECT * FROM {$this->tableName} WHERE Bokning_typ_id = ?";
+    public function getAllBookings($category) {
+        $sql = "SELECT * FROM {$this->tableNames['booking']} WHERE Bokning_typ_id = ?";
 
         $params = array($category);
         $result = $this->db->ExecuteSelectQueryAndFetchAll($sql, $params);
@@ -145,21 +148,38 @@ class CBookings {
      * Creates new content in db
      *
      */
-    public function insertContent($params) {
-    $sql = "
-                        INSERT INTO {$this->tableName} (title, slug, url, data, type, filter, published, created)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
-
-
-      $res = $this->db->ExecuteQuery($sql, $params);
+    public function insertNewBooking($params) {
+        $output = '';
+        $sql = $this->SQLBuilder->insert($this->tableNames['bookings'], $params);
+        // $sql = "INSERT INTO {$this->tableNames['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
+           //         VALUES (?, ?, ?, ?);";
+        $res = $this->db->ExecuteQuery($sql);
         if($res) {
-        $output = 'Informationen sparades.';
-      } else {
-        $output = 'Informationen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
-      }
-
-      return $output;
+            $output = '... bokningen sparades.';
+        } else {
+            $output = '... bokningen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
+        }
+        return $output;
     }
 
+
+
+    /*
+     * Creates new content in db
+     *
+     */
+    public function insertNewCottageBooking($params) {
+        $output = '';
+        $sql = $this->SQLBuilder->insert($this->tableNames['cottageBookings'], $params);
+        //$sql = "INSERT INTO {$this->tableNames['cottageBookings']} (Bokning_id, Stuga_id, person01, person02, person03, person04, person05, person06, person07, person08, )
+         //               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);;";
+        $res = $this->db->ExecuteQuery($sql, $params);
+        if($res) {
+            $output = '... stugbokningen sparades.';
+        } else {
+            $output = '... stugbokningen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
+        }
+        return $output;
+    }
 
 }

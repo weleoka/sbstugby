@@ -77,7 +77,7 @@ class CDatabase {
    * @param boolean $debug defaults to false, set to true to print out the sql query before executing it.
    * @return boolean returns TRUE on success or FALSE on failure.
    */
-  public function ExecuteQuery($query, $params = array(), $debug=false) {
+  public function ExecuteQuery($query, $params = array(), $debug=true) {
 
     self::$queries[] = $query;
     self::$params[]  = $params;
@@ -113,6 +113,13 @@ class CDatabase {
   public function LastInsertId() {
     return $this->db->lastInsertid();
   }
+  /**
+   * Return error info.
+   */
+  public function ErrorInfo() {
+    return $this->db->ErrorInfo();
+  }
+
 
   /**
    * Save debug information in session, useful as a flashmemory when redirecting to another page.
@@ -132,6 +139,7 @@ class CDatabase {
     $_SESSION['CDatabase']['queries']    = self::$queries;
     $_SESSION['CDatabase']['params']     = self::$params;
   }
+
 
 
   /**
