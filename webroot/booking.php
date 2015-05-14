@@ -25,11 +25,19 @@ $acronym = isset($_SESSION['user']) ? $_SESSION['user']->acronym : 1;
 $output = '';
 
 if (is_numeric($category)){
-    $categoryStr = $bookings->getCategoryStr($category);
-    $form = new CBooking_form($roo['database'], $roo['tableNames']);
+
+    if ($category = 1) {
+        $form = new CBooking_cottage($roo['database'], $roo['tableNames']);
+    } else if ($category = 2) {
+        $form = new CBooking_bike($roo['database'], $roo['tableNames']);
+    } else if ($category = 3) {
+        $form = new CBooking_skii($roo['database'], $roo['tableNames']);
+    }
     $form->makeForm($category);
+
+    $categoryStr = $bookings->getCategoryStr($category);
     $formStr = $form->getHTML();
-    // dump($formStr);
+
 } else {
     $categoryStr = "No category booking.";
     $formStr = "no category found matching the criteria.";

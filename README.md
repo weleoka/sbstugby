@@ -14,6 +14,13 @@ Built by Kai Weeks
 LastInsertID does not return correct. Read up about PDO methods.
 PDO and database transactions.
 
+PDO 
+0: Stores the SQLSTATE code as defined in the SQL standard
+1: Stores the database driver–specific error code
+2: Stores the database driver–specific error message
+
+What is print_r($params, 1)
+
 ### License
 
 

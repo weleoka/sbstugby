@@ -1,11 +1,9 @@
 <?php
-
-
 /**
- * CBooking_form, class that represents booking forms
+ * CBooking_cottage, class that represents booking cottages.
  *
  */
-class CBooking_form {
+class CBooking_cottage {
 
   /*
    * Constructor that accepts $db credentials and creates CDatabase object
@@ -34,40 +32,13 @@ class CBooking_form {
 
 
     /*
-     * Make form according to what category it is.
+     * Make form.
      *
-     * @params integer.
+     * @params integer $categoryCode The code to insert into the booking.
      * @return void
      */
-    public function makeForm ($category) {
-        if ($category = 1) {
-            $formFields = $this->makeCottageFormFields(1);
-        } else if ($category = 2) {
-            $formFields = $this->makeBikeFormFields(2);
-        } else if ($category = 3) {
-            $formFields = $this->makeSkiiFormFields(3);
-        }
+    public function makeForm ($categoryCode) {
 
-        $form = $this->form->create([], $formFields);
-
-        // Check the status of the form.
-        $status = $form->check();
-
-        if ($status === true) {
-            print('Bokningen genomfördes');
-
-        } else if ($status === false) {
-            print('Din bokning kunde inte genomföras.');
-        }
-    }
-
-
-    /*
-     * Make the cottage form fields.
-     *
-     * @return array
-     */
-    public function makeCottageFormFields ($categoryCode) {
         $form = $this->form;
 
         $invoices = $this->invoice->getAll();
@@ -95,7 +66,7 @@ class CBooking_form {
           $selectCottages[ $cottage->id ] = $cottage->id;
         }
 
-        return [
+        $form = $this->form->create([], [
             'invoice' => [
                         'type'      => 'select',
                         'label'      => 'Välj Faktura: ',
@@ -166,34 +137,29 @@ class CBooking_form {
                 'class'     => 'bigButton',
                 'callback'  => function($form) use ($categoryCode) {
 
+                    // PDO::beginTransaction()
+                    // 'timestamp'     => getTime(),
+
                     $sql = "START TRANSACTION;";
                     $output = 'Started transaction: ';
 
                     $periodParams = [
-                     /* isset( $tag ) ? ''          : 'välj kategori: ', */
                         'Vecka_start'      => $form->Value('first_week'),
                         'Vecka_slut'       => $form->Value('last_week'),
                     ];
                     $output .= $this->period->insertNewPeriod($periodParams);
 
                     $bookingParams = [
-                    /* `Faktura_id` INT NULL ,
-                      `Kal_prislista_id` INT NOT NULL ,
-                      `Kal_period_id` INT NOT NULL ,
-                      `Bokning_typ_id` VARCHAR(255) NOT NULL */
                         'Bokning_faktura_id'=> $form->Value('invoice'),
                         'Kal_prislista_id'      => $form->Value('priceList'),
                         'Kal_period_id'         => $this->db->LastInsertId(),
                         'Bokning_typ_id'      => $categoryCode,
-                        // 'timestamp'     => getTime(),
+
                     ];
                     $output .= $this->booking->insertNewBooking($bookingParams);
 
                     $cottageBookingParams = [
-                     /* `Bokning_id` INT NOT NULL ,
-                      `Stuga_id` INT NULL ,
-                      `Person_01` INT NULL DEFAULT NULL */
-                        'Bokning_id'  => $this->db->LastInsertId(),
+                        'Bokning_id'       => $this->db->LastInsertId(),
                         'Stuga_id'          => $form->Value('cottage'),
                         'Person_01'       => $form->Value('person01'),
                         'Person_02'       => $form->Value('person02'),
@@ -220,84 +186,19 @@ class CBooking_form {
                     }
                 }
             ],
-        ];
+        ]);
+
+        // Check the status of the form.
+        $status = $form->check();
+
+        if ($status === true) {
+            print('Bokningen genomfördes');
+
+        } else if ($status === false) {
+            print('Din bokning kunde inte genomföras.');
+        }
     }
 
-
-
-
-
-
-
-    /*
-     * Make the bike form fields.
-     *
-     * @return array
-     */
-    public function makeBikeFormFields () {
-        return [
-            'content' => [
-                'type'        => 'textarea',
-                'label'       => '',
-                'placeholder' => 'Skriv ett svar',
-                'validation'  => ['not_empty'],
-            ],
-            'submit' => [
-                'type'      => 'submit',
-                'class'     => 'bigButton',
-                'callback'  => function($form) use ($question){
-
-
-                $this->answers->save([
-                        'userID'            => $user->id,
-                        'parentID'      => $question->id,
-                        'parentTitle'   => $question->title,
-                'name'          => $user->name,
-                'content'       => $form->Value('content'),
-                'email'         => $user->email,
-                'timestamp'     => getTime(),
-                ]);
-
-                return true;
-                }
-            ],
-        ];
-    }
-
-    /*
-     * Make the skii form fields.
-     *
-     * @return array
-     */
-    public function makeSkiiFormFields () {
-        return [
-            'content' => [
-                'type'        => 'textarea',
-                'label'       => '',
-                'placeholder' => 'Skriv ett svar',
-                'validation'  => ['not_empty'],
-            ],
-            'submit' => [
-                'type'      => 'submit',
-                'class'     => 'bigButton',
-                'callback'  => function($form) use ($question){
-
-
-                $this->answers->save([
-                        'userID'            => $user->id,
-                        'parentID'      => $question->id,
-                        'parentTitle'   => $question->title,
-                'name'          => $user->name,
-                'content'       => $form->Value('content'),
-                'email'         => $user->email,
-                'timestamp'     => getTime(),
-                ]);
-
-                return true;
-                }
-            ],
-        ];
-    }
 
 }
 
