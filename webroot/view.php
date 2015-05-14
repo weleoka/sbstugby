@@ -7,7 +7,7 @@ include(__DIR__.'/config.php');
 $roo['title'] = "Visa bokningar";
 
 $db = new CDatabase($roo['database']);
-$bookings = new CBookings($roo['database'], $roo['tableNames']);
+$bookings = new CBooking($roo['database'], $roo['tableNames']);
 
 
 // 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning

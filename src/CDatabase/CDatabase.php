@@ -52,7 +52,7 @@ class CDatabase {
    * @param boolean $debug defaults to false, set to true to print out the sql query before executing it.
    * @return array with resultset.
    */
-  public function ExecuteSelectQueryAndFetchAll($query, $params=array(), $debug=false) {
+  public function ExecuteSelectQueryAndFetchAll($query, $params=array(), $debug=true) {
 
     self::$queries[] = $query;
     self::$params[]  = $params;

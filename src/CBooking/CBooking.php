@@ -5,7 +5,7 @@
  * CBookings, class that represents bookings
  *
  */
-class CBookings {
+class CBooking {
 
     public $db;
     protected $tableName;
@@ -60,12 +60,12 @@ class CBookings {
      * @return string with html to display content
      */
     public function getAllBookings($category) {
-        $sql = "SELECT * FROM {$this->tableNames['booking']} WHERE Bokning_typ_id = ?";
+        $sql = "SELECT * FROM {$this->tableNames['bookings']} WHERE Bokning_typ_id = ?";
 
         $params = array($category);
         $result = $this->db->ExecuteSelectQueryAndFetchAll($sql, $params);
         $listHTML = "";
-
+        Dump ($result);
         foreach($result AS $key => $val) {
             $listHTML .= "<li>";
             $listHTML .= $val->id;

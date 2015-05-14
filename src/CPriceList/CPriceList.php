@@ -2,13 +2,11 @@
 
 
 /**
- * CPeriod, class that represents time period
- *
+ * CPriceList, class that represents pricelists.
  */
-class CPeriod {
 
-    public $db;
-    protected $tableName;
+
+class CPriceList {
 
   /*
    * Constructor that accepts $db credentials and creates CDatabase object
@@ -16,29 +14,38 @@ class CPeriod {
    */
     public function __construct($dbCredentials, $tableNames) {
         $this->db = new CDatabase($dbCredentials);
-        $this->SQLBuilder = new CSQLQueryBuilderBasic();
         $this->tableNames = $tableNames;
     }
 
-    public function getAllWeeks() {
-        $sql = "SELECT * FROM {$this->tableNames['calendarWeek']}";
+
+    /*
+     * Gets all
+     *
+     * @return object
+     */
+     public function getAll () {
+        $sql = "SELECT * FROM {$this->tableNames['priceLists']}";
         $results = $this->db->ExecuteSelectQueryAndFetchAll($sql);
         // dump($results);
         return $results;
-    }
+     }
 
-    public function insertNewPeriod($params) {
+/*     public function insertNewInvoice($params) {
         $output = '';
-        $sql = $this->SQLBuilder->insert($this->tableNames['bookingPeriod'], $params);
-        //$sql = "INSERT INTO {$this->tableNames['bookingPeriod']} (Vecka_start, Vecka_slut)
-        //            VALUES (?, ?);";
+        $sql = "INSERT INTO {$this->tableNames['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
+                    VALUES (?, ?, ?, $categoryCode);";
         $res = $this->db->ExecuteQuery($sql, $params);
-        if ($res) {
+        if($res) {
             $output = '... periodinformationen sparades.';
         } else {
             $output = '... periodinformationen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
         }
         return $output;
+    }*/
+/*
+    foreach ($tags as $tag) {
+      $aaa[$tag->tag] = $tag->tag;
     }
+*/
 
 }

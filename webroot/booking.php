@@ -10,7 +10,7 @@ include(__DIR__.'/config.php');
 // Save variables in Roo container
 $roo['title'] = "Boka";
 
-$bookings = new CBookings($roo['database'], $roo['tableNames']);
+$bookings = new CBooking($roo['database'], $roo['tableNames']);
 
 // GET parameters from URL.
 $category = isset($_GET['category']) ? $_GET['category'] : null;

@@ -2,7 +2,7 @@
 
 
 /**
- * CBilling, class that represents billing.
+ * CInvoice, class that represents billing.
  */
 
 

@@ -125,7 +125,7 @@ $roo['tableNames'] = array(
 
                                 'bookingPeriod'=>'kal_period',
                                 'priceClass'=>'kal_prisklass',
-                                'priceList'=>'kal_prislista',
+                                'priceLists'=>'kal_prislista',
                                 'calendarWeek'=>'kal_vecka',
 
                                 'person'=>'person',

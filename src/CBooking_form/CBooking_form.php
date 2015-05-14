@@ -17,8 +17,10 @@ class CBooking_form {
             $this->form = new \Mos\HTMLForm\CForm();
             $this->person = new CPerson($dbCredentials, $tableNames);
             $this->invoice = new CInvoice($dbCredentials, $tableNames);
-            $this->booking = new CBookings($dbCredentials, $tableNames);
+            $this->priceList = new CPriceList($dbCredentials, $tableNames);
+            $this->booking = new CBooking($dbCredentials, $tableNames);
             $this->period = new CPeriod($dbCredentials, $tableNames);
+            $this->cottage = new CCottage($dbCredentials, $tableNames);
     }
 
     /*
@@ -73,6 +75,11 @@ class CBooking_form {
           $selectInvoices[ $invoice->id ] = $invoice->namn;
         }
 
+        $priceLists = $this->priceList->getAll();
+        foreach ($priceLists as $priceList) {
+          $selectPriceLists[ $priceList->id ] = $priceList->Beskrivning;
+        }
+
         $persons = $this->person->getAll();
         foreach ($persons as $person) {
           $selectPersons[ $person->id ] = $person->Namn;
@@ -83,11 +90,21 @@ class CBooking_form {
           $selectWeeks[ $week->id ] = $week->id;
         }
 
+        $cottages = $this->cottage->getAll();
+        foreach ($cottages as $cottage) {
+          $selectCottages[ $cottage->id ] = $cottage->id;
+        }
+
         return [
             'invoice' => [
                         'type'      => 'select',
                         'label'      => 'Välj Faktura: ',
                         'options'  => $selectInvoices,
+            ],
+            'priceList' => [
+                        'type'      => 'select',
+                        'label'      => 'Välj prislista: ',
+                        'options'  => $selectPriceLists,
             ],
             'first_week' => [
                         'type'      => 'select',
@@ -98,6 +115,11 @@ class CBooking_form {
                         'type'      => 'select',
                         'label'      => 'Välj slutvecka: ',
                         'options'  => $selectWeeks,
+            ],
+            'cottage' => [
+                        'type'      => 'select',
+                        'label'      => 'Välj stuga: ',
+                        'options'  => $selectCottages,
             ],
             'person01' => [
                         'type'      => 'select',
@@ -149,8 +171,8 @@ class CBooking_form {
 
                     $periodParams = [
                      /* isset( $tag ) ? ''          : 'välj kategori: ', */
-                        'first_week'      => $form->Value('first_week'),
-                        'last_week'       => $form->Value('last_week'),
+                        'Vecka_start'      => $form->Value('first_week'),
+                        'Vecka_slut'       => $form->Value('last_week'),
                     ];
                     $output .= $this->period->insertNewPeriod($periodParams);
 
@@ -159,10 +181,10 @@ class CBooking_form {
                       `Kal_prislista_id` INT NOT NULL ,
                       `Kal_period_id` INT NOT NULL ,
                       `Bokning_typ_id` VARCHAR(255) NOT NULL */
-                        'invoice'           => $form->Value('invoice'),
-                        'priceList'         => $form->Value('priceList'),
-                        'last_insert_period_id'  => $this->db->LastInsertId(),
-                        'category'         => $categoryCode,
+                        'Bokning_faktura_id'=> $form->Value('invoice'),
+                        'Kal_prislista_id'      => $form->Value('priceList'),
+                        'Kal_period_id'         => $this->db->LastInsertId(),
+                        'Bokning_typ_id'      => $categoryCode,
                         // 'timestamp'     => getTime(),
                     ];
                     $output .= $this->booking->insertNewBooking($bookingParams);
@@ -171,16 +193,16 @@ class CBooking_form {
                      /* `Bokning_id` INT NOT NULL ,
                       `Stuga_id` INT NULL ,
                       `Person_01` INT NULL DEFAULT NULL */
-                        'last_insert_booking_id'  => $this->db->LastInsertId(),
-                        'cottage'          => $form->Value('cottage'),
-                        'person01'       => $form->Value('person01'),
-                        'person02'       => $form->Value('person02'),
-                        'person03'       => $form->Value('person03'),
-                        'person04'       => $form->Value('person04'),
-                        'person05'       => $form->Value('person05'),
-                        'person06'       => $form->Value('person06'),
-                        'person07'       => $form->Value('person07'),
-                        'person08'       => $form->Value('person08'),
+                        'Bokning_id'  => $this->db->LastInsertId(),
+                        'Stuga_id'          => $form->Value('cottage'),
+                        'Person_01'       => $form->Value('person01'),
+                        'Person_02'       => $form->Value('person02'),
+                        'Person_03'       => $form->Value('person03'),
+                        'Person_04'       => $form->Value('person04'),
+                        'Person_05'       => $form->Value('person05'),
+                        'Person_06'       => $form->Value('person06'),
+                        'Person_07'       => $form->Value('person07'),
+                        'Person_08'       => $form->Value('person08'),
                     ];
                     $output .= $this->booking->insertNewCottageBooking($cottageBookingParams);
 
@@ -189,10 +211,13 @@ class CBooking_form {
 
                     if($res) {
                         $output .= 'Informationen sparades.';
+                        print($output);
+                        return true;
                     } else {
                         $output .= 'Informationen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
+                        print($output);
+                        return false;
                     }
-                    return $output;
                 }
             ],
         ];
