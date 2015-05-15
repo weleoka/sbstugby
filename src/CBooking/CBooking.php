@@ -51,25 +51,58 @@ class CBooking {
 
 
     /*
-     * Gets all bookings ( under certain category )
+     * Get bookings under certain category.
      *
      * @return string with html to display content
      */
-    public function getAllBookings($category) {
+    public function getBookings($category) {
         $sql = "SELECT * FROM {$this->tn['bookings']} WHERE Bokning_typ_id = ?";
         $params = array($category);
 
         $this->db->execute($sql, $params);
         $result = $this->db->fetchAll();
 
+        return $result;
+
+
+    }
+
+
+   /*
+     * Get all bookings regardless of category.
+     *
+     * @return string with html to display content
+     */
+    public function getAllBookings() {
         $listHTML = "";
+
+        for ($i = 1; $i <= 3; $i++) {
+            $result = $this->getBookings($i);
+            $categoryStr = $this->getCategoryStr($i) . "ar"; // Append "ar" for plural.
+            $listHTML .= "<h1>" . $categoryStr . "</h1>";
+            $listHTML .= $this->listBookings($result);
+        }
+
+        return $listHTML;
+    }
+
+
+   /*
+     * List resultset in HTML.
+     *
+     * @param $result the resultset from db query.
+     * @return string with html to display content
+     */
+    public function listBookings($result) {
+        $listHTML = "";
+
         foreach($result AS $key => $val) {
             $listHTML .= "<li>";
-            $listHTML .= $val->id;
-            $listHTML .= $val->Faktura_id;
-            $listHTML .= $val->Kal_prislista_id;
-            $listHTML .= $val->Kal_period_id;
-            $listHTML .= $val->Bokning_typ_id;
+            $listHTML .= $val->id . "(id), ";
+            $listHTML .= $val->Bokning_faktura_id . "(faktura), ";
+            $listHTML .= $val->Kal_prislista_id . "(prislista), ";
+            $listHTML .= $val->Kal_period_id . "(period), ";
+            $listHTML .= $val->Bokning_typ_id . "(typ).";
             $listHTML .= " ( ";
             $listHTML .= "<a href=\"delete.php?id=$val->id\"> Ta bort</a> )";
             $listHTML .= "</li>";
@@ -79,21 +112,20 @@ class CBooking {
     }
 
 
-
     /*
      * Gets a booking with specific id
      *
-     * @param
-     * @return object for the specified id
+     * @param integer $id the booking category id
+     * @return resultset
      */
     public function getBooking($id) {
-
         $sql = "SELECT * FROM {$this->tableName} WHERE id = ?";
         $params = array($id);
 
         $this->db->execute($sql, $params);
+        $result = $this->db->fetchAll();
 
-        return $this->db->fetchAll();
+        return $result;
      }
 
 

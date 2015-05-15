@@ -7,7 +7,6 @@ include(__DIR__.'/config.php');
 $roo['title'] = "Visa bokningar";
 
 $db = new \Mos\Database\CDatabaseBasic();
-// $options = require "config_mysql.php";
 $db->setOptions($roo['database']);
 $db->connect();
 
@@ -15,28 +14,36 @@ $tn = $roo['tableNames'];
 
 $bookings = new CBooking($db, $tn);
 
+// GET parameters from URL.
 // 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning
-$stugbokningar = $bookings->getAllBookings(1);
-$cykelbokningar = $bookings->getAllBookings(2);
-$skidbokningar = $bookings->getAllBookings(3);
+$category = isset($_GET['category']) ? $_GET['category'] : null;
 
-$roo['header'] .= '<span class="siteslogan">See Content!</span>';
+if (is_numeric($category)){
+    $result = $bookings->getBookings($category);
+    $bokningar = $bookings->listBookings($result);
+    $categoryStr = $bookings->getCategoryStr($category) . "ar"; // Append "ar" for plural.
+
+} else if ($category = 'all') {
+    $bokningar = $bookings->getAllBookings();
+    $categoryStr = "Alla bokningar";
+
+} else {
+    $categoryStr = "No category booking.";
+    $formStr = "No category found matching the criteria.";
+}
+
+$roo['header'] .= '<span class="siteslogan">Aktuella bokningar</span>';
 
 $roo['main'] = <<<EOD
 <article>
-    <h1>Alla bokningar</h1>
+    <h1>{$categoryStr}</h1>
     <ul>
-        {$stugbokningar}
+        {$bokningar}
     </ul>
-    <ul>
-        {$cykelbokningar}
-    </ul>
-    <ul>
-        {$skidbokningar}
-    </ul>
-    <p><a href='booking.php?category=1'>Stuga</a></p>
-    <p><a href='booking.php?category=2'>Cykel</a></p>
-    <p><a href='booking.php?category=3'>Skidor</a></p>
+    <p><a href='view.php?category=1'>Stuga</a></p>
+    <p><a href='view.php?category=2'>Cykel</a></p>
+    <p><a href='view.php?category=3'>Skidor</a></p>
+    <p><a href='view.php?category=all'>Alla</a></p>
 </article>
 EOD;
 

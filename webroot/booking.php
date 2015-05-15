@@ -22,13 +22,7 @@ $bookings = new CBooking($db, $tn);
 $category = isset($_GET['category']) ? $_GET['category'] : null;
 
 // POST, from form below, parameters
-$title  = isset($_POST['title']) ? $_POST['title'] : null;
-$data   = isset($_POST['data'])  ? $_POST['data'] : null;
-$type   = isset($_POST['type'])  ? strip_tags($_POST['type']) : "post";
-$filter = isset($_POST['filter']) ? $_POST['filter'] : null;
-$published = !empty($_POST['published']) ? strip_tags($_POST['published']) : null;
 $acronym = isset($_SESSION['user']) ? $_SESSION['user']->acronym : 1;
-$output = '';
 
 if (is_numeric($category)){
 
@@ -46,23 +40,7 @@ if (is_numeric($category)){
 
 } else {
     $categoryStr = "No category booking.";
-    $formStr = "no category found matching the criteria.";
-}
-
-if(isset($_POST['save'])) {
-
-    if(!empty($title) && !empty($data)) {
-
-        $params = array($title, $data, $type, $filter, $published);
-
-        $output = $bookings->insertContent($params);
-        $db1 = $bookings->db;
-        $db1->Dump();
-    } else {
-        $output = 'Tomma fält! Informationen sparades inte!';
-    }
-
-
+    $formStr = "No category found matching the criteria.";
 }
 
 $roo['header'] .= '<span class="siteslogan">' . $categoryStr . '!</span>';

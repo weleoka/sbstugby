@@ -8,7 +8,7 @@
  * Set the error reporting.
  *
  */
-error_reporting(-1);              // Report all type of errors
+error_reporting(-1);                // Report all type of errors
 ini_set('display_errors', 1);     // Display all errors
 ini_set('output_buffering', 0);   // Do not buffer outputs, write directly
 
@@ -64,7 +64,7 @@ $roo['favicon']    = 'favicon.png';
 
 $roo['header'] = <<<EOD
 	<a href='index.php'><img class='sitelogo' src='img/rm.png' alt='SB logo'/></a>
-	<span class='sitetitle'>SB semesterbyar</span>
+	<span class='sitetitle'>SB Semesterbyar</span>
 EOD;
 
 
