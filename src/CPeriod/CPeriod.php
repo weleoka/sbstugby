@@ -14,31 +14,23 @@ class CPeriod {
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($dbCredentials, $tableNames) {
-        $this->db = new CDatabase($dbCredentials);
-        $this->SQLBuilder = new CSQLQueryBuilderBasic();
-        $this->tableNames = $tableNames;
+    public function __construct($db, $tableNames) {
+        $this->db = $db; // new CDatabase($dbCredentials);
+        $this->tn = $tableNames;
     }
 
     public function getAllWeeks() {
-        $sql = "SELECT * FROM {$this->tableNames['calendarWeek']}";
-        $results = $this->db->ExecuteSelectQueryAndFetchAll($sql);
+        $sql = "SELECT * FROM {$this->tn['calendarWeek']}";
+        $this->db->execute($sql);
         // dump($results);
-        return $results;
+        return $this->db->fetchAll();
     }
 
     public function insertNewPeriod($params) {
-        $output = '';
-        $sql = $this->SQLBuilder->insert($this->tableNames['bookingPeriod'], $params);
-        //$sql = "INSERT INTO {$this->tableNames['bookingPeriod']} (Vecka_start, Vecka_slut)
-        //            VALUES (?, ?);";
-        $res = $this->db->ExecuteQuery($sql, $params);
-        if ($res) {
-            $output = '... periodinformationen sparades.';
-        } else {
-            $output = '... periodinformationen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
-        }
-        return $output;
+        $this->db->insert($this->tn['bookingPeriod'], $params);
+        // $sql = "INSERT INTO {$this->tn['bookingPeriod']} (Vecka_start, Vecka_slut)
+           //          VALUES (?, ?);";
+        return $this->db->execute();
     }
 
 }

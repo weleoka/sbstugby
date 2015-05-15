@@ -12,13 +12,15 @@ error_reporting(-1);              // Report all type of errors
 ini_set('display_errors', 1);     // Display all errors
 ini_set('output_buffering', 0);   // Do not buffer outputs, write directly
 
+date_default_timezone_set('Europe/Stockholm');
+
 
 /**
- * Define Roo paths.
+ * Define essential Roo paths, end with /
  *
  */
-date_default_timezone_set('Europe/Stockholm');
-define('ROO_INSTALL_PATH', __DIR__ . '/..');
+define('ROO_INSTALL_PATH', realpath(__DIR__ . '/../') . '/');
+// define('ROO_INSTALL_PATH', __DIR__ . '/..');
 define('ROO_THEME_PATH', ROO_INSTALL_PATH . '/theme/render.php');
 
 
@@ -104,13 +106,9 @@ $roo['navbar'] = array(
 
 /**
  * Settings for the database.
- *
+ * Connection options and credentials in config_mysql.php file.
  */
-$roo['database']['dbname']      = 'mydb.';                                                   // Used in some query builders NOTE: the full stop!
-$roo['database']['dsn']      	 = 'mysql:host=localhost;dbname=mydb;'; 	// 'mysql:host=blu-ray.student.bth.se;dbname=kawe14;';
-$roo['database']['username']    = 'root';					// kawe14
-$roo['database']['password']    = 'enter112';					// 4pido7X]
-$roo['database']['driver_options'] = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'");
+$roo['database'] = require "config_mysql.php";
 
 $roo['tableNames'] = array(
                                 'bookings'=>'bokning',

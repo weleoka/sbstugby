@@ -10,9 +10,9 @@ class CPerson {
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($dbCredentials, $tableNames) {
-        $this->db = new CDatabase($dbCredentials);
-        $this->tableNames = $tableNames;
+    public function __construct($db, $tableNames) {
+        $this->db = $db; // new CDatabase($dbCredentials);
+        $this->tn = $tableNames;
     }
 
 
@@ -22,10 +22,10 @@ class CPerson {
      * @return object
      */
      public function getAll () {
-        $sql = "SELECT * FROM {$this->tableNames['person']}";
-        $results = $this->db->ExecuteSelectQueryAndFetchAll($sql);
+        $sql = "SELECT * FROM {$this->tn['person']}";
+        $this->db->execute($sql);
         // dump($results);
-        return $results;
+        return $this->db->fetchAll();
      }
 /*
     foreach ($tags as $tag) {

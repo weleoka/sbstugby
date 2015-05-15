@@ -9,17 +9,19 @@ class CBooking_cottage {
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($dbCredentials, $tableNames) {
-            $this->db = new CDatabase($dbCredentials);
-            $this->tableNames = $tableNames;
+    public function __construct($db, $tableNames) {
+            $this->db = $db; // new CDatabase($dbCredentials);
+            $tn = $tableNames;
             $this->form = new \Mos\HTMLForm\CForm();
-            $this->person = new CPerson($dbCredentials, $tableNames);
-            $this->invoice = new CInvoice($dbCredentials, $tableNames);
-            $this->priceList = new CPriceList($dbCredentials, $tableNames);
-            $this->booking = new CBooking($dbCredentials, $tableNames);
-            $this->period = new CPeriod($dbCredentials, $tableNames);
-            $this->cottage = new CCottage($dbCredentials, $tableNames);
+
+            $this->person = new CPerson($db, $tn);
+            $this->invoice = new CInvoice($db, $tn);
+            $this->priceList = new CPriceList($db, $tn);
+            $this->booking = new CBooking($db, $tn);
+            $this->period = new CPeriod($db, $tn);
+            $this->cottage = new CCottage($db, $tn);
     }
+
 
     /*
      * Print form
@@ -140,15 +142,17 @@ class CBooking_cottage {
                     // PDO::beginTransaction()
                     // 'timestamp'     => getTime(),
 
-                    $sql = "START TRANSACTION;";
+                    // $sql = "START TRANSACTION;";
+                    // $this->db->execute($sql);
                     $output = 'Started transaction: ';
 
                     $periodParams = [
                         'Vecka_start'      => $form->Value('first_week'),
-                        'Vecka_slut'       => $form->Value('last_week'),
+                        'Vecka_slut'        => $form->Value('last_week'),
                     ];
-                    $output .= $this->period->insertNewPeriod($periodParams);
-
+                    $res01 = $this->period->insertNewPeriod($periodParams);
+                    // $newId = $this->db->LastInsertId(); // ->LAST_INSERT_ID();
+                    // dump($newId);
                     $bookingParams = [
                         'Bokning_faktura_id'=> $form->Value('invoice'),
                         'Kal_prislista_id'      => $form->Value('priceList'),
@@ -156,7 +160,7 @@ class CBooking_cottage {
                         'Bokning_typ_id'      => $categoryCode,
 
                     ];
-                    $output .= $this->booking->insertNewBooking($bookingParams);
+                    $res02 = $this->booking->insertNewBooking($bookingParams);
 
                     $cottageBookingParams = [
                         'Bokning_id'       => $this->db->LastInsertId(),
@@ -170,20 +174,16 @@ class CBooking_cottage {
                         'Person_07'       => $form->Value('person07'),
                         'Person_08'       => $form->Value('person08'),
                     ];
-                    $output .= $this->booking->insertNewCottageBooking($cottageBookingParams);
+                    $res03 = $this->booking->insertNewCottageBooking($cottageBookingParams);
 
-                    $sql = "COMMIT;";
-                    $res = $this->db->ExecuteQuery($sql);
-
-                    if($res) {
-                        $output .= 'Informationen sparades.';
-                        print($output);
+                    if ($res01 && $res02 && $res03) {
                         return true;
                     } else {
-                        $output .= 'Informationen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
-                        print($output);
-                        return false;
+                        print("First: " . $res01 . " Second: " . $res02 . " Third: " . $res03);
                     }
+                    // $sql = "COMMIT;";
+                    // $res = $this->db->execute($sql);
+
                 }
             ],
         ]);

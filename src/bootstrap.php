@@ -4,6 +4,24 @@
  *
  */
 
+
+/**
+ * Including composer autoloader if available.
+ *
+ * @link https://getcomposer.org/doc/01-basic-usage.md#autoloading
+ */
+if(is_file(ROO_INSTALL_PATH . 'vendor/autoload.php')) {
+    include ROO_INSTALL_PATH . 'vendor/autoload.php';
+}
+
+
+/**
+ * Another autoloader for classes.
+ *
+ */
+// include(ROO_INSTALL_PATH . '/src/CForm/autoloader.php');
+
+
 /**
  * Default exception handler.
  *
@@ -13,11 +31,6 @@ function myExceptionHandler($exception) {
 }
 set_exception_handler('myExceptionHandler');
 
-/**
- * Another autoloader for classes.
- *
- */
-include(ROO_INSTALL_PATH . '/src/CForm/autoloader.php');
 
 /**
  * Autoloader for classes.
@@ -34,9 +47,6 @@ function myAutoloader($class) {
   }
 }
 spl_autoload_register('myAutoloader');
-
-
-
 
 
 

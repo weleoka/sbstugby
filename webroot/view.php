@@ -6,9 +6,14 @@ include(__DIR__.'/config.php');
 // Save variablers in Roo container
 $roo['title'] = "Visa bokningar";
 
-$db = new CDatabase($roo['database']);
-$bookings = new CBooking($roo['database'], $roo['tableNames']);
+$db = new \Mos\Database\CDatabaseBasic();
+// $options = require "config_mysql.php";
+$db->setOptions($roo['database']);
+$db->connect();
 
+$tn = $roo['tableNames'];
+
+$bookings = new CBooking($db, $tn);
 
 // 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning
 $stugbokningar = $bookings->getAllBookings(1);

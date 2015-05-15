@@ -1,8 +1,6 @@
 <?php
-
-
 /**
- * CBookings, class that represents bookings
+ * CBookings, class that represents bookings.
  *
  */
 class CBooking {
@@ -14,11 +12,9 @@ class CBooking {
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($dbCredentials, $tableNames) {
-        $this->db = new CDatabase($dbCredentials);
-        $this->SQLBuilder = new CSQLQueryBuilderBasic();
-        $this->SQLBuilder->setTablePrefix($dbCredentials['dbname']);
-        $this->tableNames = $tableNames;
+    public function __construct($db, $tableNames) {
+        $this->db = $db; //new CDatabase($dbCredentials);
+        $this->tn = $tableNames;
     }
 
 
@@ -29,10 +25,10 @@ class CBooking {
      * @return string with html to display content
      */
      public function getAllCategories () {
-        $sql = "SELECT Beskrivning FROM {$this->tableNames['bookingCategory']}";
-        $result = $this->db->ExecuteSelectQueryAndFetchAll($sql);
+        $sql = "SELECT Beskrivning FROM {$this->tn['bookingCategory']}";
+        $this->db->execute($sql);
 
-        return $result;
+        return $this->db->fetchAll();
      }
 
 
@@ -44,11 +40,11 @@ class CBooking {
      * @return string
      */
      public function getCategoryStr ($id) {
-        $sql = "SELECT Beskrivning FROM {$this->tableNames['bookingCategory']} WHERE id = ?";
+        $sql = "SELECT Beskrivning FROM {$this->tn['bookingCategory']} WHERE id = ?";
 
         $params = array($id);
-        $result = $this->db->ExecuteSelectQueryAndFetchAll($sql, $params);
-
+        $this->db->execute($sql, $params);
+        $result = $this->db->fetchAll();
         return $result[0]->Beskrivning;
      }
 
@@ -60,12 +56,13 @@ class CBooking {
      * @return string with html to display content
      */
     public function getAllBookings($category) {
-        $sql = "SELECT * FROM {$this->tableNames['bookings']} WHERE Bokning_typ_id = ?";
-
+        $sql = "SELECT * FROM {$this->tn['bookings']} WHERE Bokning_typ_id = ?";
         $params = array($category);
-        $result = $this->db->ExecuteSelectQueryAndFetchAll($sql, $params);
+
+        $this->db->execute($sql, $params);
+        $result = $this->db->fetchAll();
+
         $listHTML = "";
-        Dump ($result);
         foreach($result AS $key => $val) {
             $listHTML .= "<li>";
             $listHTML .= $val->id;
@@ -80,12 +77,9 @@ class CBooking {
 
         return $listHTML;
     }
-/*
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `Faktura_id` INT NULL ,
-  `Kal_prislista_id` INT NOT NULL ,
-  `Kal_period_id` INT NOT NULL ,
-  `Bokning_typ_id` VARCHAR(255) NOT NULL */
+
+
+
     /*
      * Gets a booking with specific id
      *
@@ -97,9 +91,9 @@ class CBooking {
         $sql = "SELECT * FROM {$this->tableName} WHERE id = ?";
         $params = array($id);
 
-        $result = $this->db->ExecuteSelectQueryAndFetchAll($sql, $params);
+        $this->db->execute($sql, $params);
 
-        return $result;
+        return $this->db->fetchAll();
      }
 
 
@@ -120,7 +114,7 @@ class CBooking {
                  updated = NOW()
                      WHERE id = ?";
 
-      $res = $this->db->ExecuteQuery($sql, $params);
+      $res = $this->db->execute($sql, $params);
 
       if($res) {
         $output = 'Informationen sparades.';
@@ -131,34 +125,17 @@ class CBooking {
       return $output;
     }
 
+
+
     /*
      * Permanently Deletes content.
      *
      */
-	  function delete($id) {
-    		$sql = "DELETE FROM {$this->tableName} WHERE id = ?";
-   		$params = array($id);
-    		$this->db->ExecuteQuery($sql, $params);
-    		$output="Det raderades " . $this->db->RowCount() . " rader från databasen.";
-    		return $output;
-		}
-
-
-    /*
-     * Creates new content in db
-     *
-     */
-    public function insertNewBooking($params) {
-        $output = '';
-        $sql = $this->SQLBuilder->insert($this->tableNames['bookings'], $params);
-        // $sql = "INSERT INTO {$this->tableNames['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
-           //         VALUES (?, ?, ?, ?);";
-        $res = $this->db->ExecuteQuery($sql);
-        if($res) {
-            $output = '... bokningen sparades.';
-        } else {
-            $output = '... bokningen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
-        }
+    public function delete($id) {
+        $sql = "DELETE FROM {$this->tableName} WHERE id = ?";
+        $params = array($id);
+        $this->db->execute($sql, $params);
+        $output = "Det raderades " . $this->db->RowCount() . " rader från databasen.";
         return $output;
     }
 
@@ -168,18 +145,24 @@ class CBooking {
      * Creates new content in db
      *
      */
+    public function insertNewBooking($params) {
+        $this->db->insert($this->tn['bookings'], $params);
+        //$sql = "INSERT INTO {$this->tn['bookings']} (Bokning_faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
+          //          VALUES (?, ?, ?, ?);";
+        return $this->db->execute();
+    }
+
+
+
+    /*
+     * Creates new content in db for a cottage booking
+     *
+     */
     public function insertNewCottageBooking($params) {
-        $output = '';
-        $sql = $this->SQLBuilder->insert($this->tableNames['cottageBookings'], $params);
-        //$sql = "INSERT INTO {$this->tableNames['cottageBookings']} (Bokning_id, Stuga_id, person01, person02, person03, person04, person05, person06, person07, person08, )
-         //               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);;";
-        $res = $this->db->ExecuteQuery($sql, $params);
-        if($res) {
-            $output = '... stugbokningen sparades.';
-        } else {
-            $output = '... stugbokningen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
-        }
-        return $output;
+        $this->db->insert($this->tn['cottageBookings'], $params);
+        // $sql = "INSERT INTO {$this->tn['cottageBookings']} (Bokning_id, Stuga_id, person01, person02, person03, person04, person05, person06, person07, person08, )
+           //         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        return $this->db->execute();
     }
 
 }

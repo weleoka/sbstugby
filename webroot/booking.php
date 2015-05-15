@@ -10,7 +10,13 @@ include(__DIR__.'/config.php');
 // Save variables in Roo container
 $roo['title'] = "Boka";
 
-$bookings = new CBooking($roo['database'], $roo['tableNames']);
+$db = new \Mos\Database\CDatabaseBasic();
+$db->setOptions($roo['database']);
+$db->connect();
+
+$tn = $roo['tableNames'];
+
+$bookings = new CBooking($db, $tn);
 
 // GET parameters from URL.
 $category = isset($_GET['category']) ? $_GET['category'] : null;
@@ -27,11 +33,11 @@ $output = '';
 if (is_numeric($category)){
 
     if ($category = 1) {
-        $form = new CBooking_cottage($roo['database'], $roo['tableNames']);
+        $form = new CBooking_cottage($db, $tn);
     } else if ($category = 2) {
-        $form = new CBooking_bike($roo['database'], $roo['tableNames']);
+        $form = new CBooking_bike($db, $tn);
     } else if ($category = 3) {
-        $form = new CBooking_skii($roo['database'], $roo['tableNames']);
+        $form = new CBooking_skii($db, $tn);
     }
     $form->makeForm($category);
 

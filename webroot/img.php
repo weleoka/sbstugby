@@ -8,7 +8,7 @@ include (__DIR__ . '/config.php');
 // Ensure error reporting is on
 //
 error_reporting(-1);              // Report all type of errors
-ini_set('display_errors', 1);     // Display all errors 
+ini_set('display_errors', 1);     // Display all errors
 ini_set('output_buffering', 0);   // Do not buffer outputs, write directly
 
 

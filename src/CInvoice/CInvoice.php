@@ -12,9 +12,9 @@ class CInvoice {
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($dbCredentials, $tableNames) {
-        $this->db = new CDatabase($dbCredentials);
-        $this->tableNames = $tableNames;
+    public function __construct($db, $tableNames) {
+        $this->db = $db; // new CDatabase($dbCredentials);
+        $this->tn = $tableNames;
     }
 
 
@@ -24,19 +24,18 @@ class CInvoice {
      * @return object
      */
      public function getAll () {
-        $sql = "SELECT {$this->tableNames['invoices']}.id,  {$this->tableNames['person']}.namn
-                    FROM {$this->tableNames['invoices']}, {$this->tableNames['person']}
-                    WHERE {$this->tableNames['invoices']}.id = {$this->tableNames['person']}.id";
-        $results = $this->db->ExecuteSelectQueryAndFetchAll($sql);
-
+        $sql = "SELECT {$this->tn['invoices']}.id,  {$this->tn['person']}.namn
+                    FROM {$this->tn['invoices']}, {$this->tn['person']}
+                    WHERE {$this->tn['invoices']}.id = {$this->tn['person']}.id";
+        $this->db->execute($sql);
         // dump($results);
-        return $results;
+        return $this->db->fetchAll();
      }
 
 
 /*     public function insertNewInvoice($params) {
         $output = '';
-        $sql = "INSERT INTO {$this->tableNames['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
+        $sql = "INSERT INTO {$this->tn['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
                     VALUES (?, ?, ?, $categoryCode);";
         $res = $this->db->ExecuteQuery($sql, $params);
         if($res) {

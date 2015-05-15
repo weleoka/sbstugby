@@ -12,9 +12,9 @@ class CPriceList {
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($dbCredentials, $tableNames) {
-        $this->db = new CDatabase($dbCredentials);
-        $this->tableNames = $tableNames;
+    public function __construct($db, $tableNames) {
+        $this->db = $db; // new CDatabase($dbCredentials);
+        $this->tn = $tableNames;
     }
 
 
@@ -24,10 +24,10 @@ class CPriceList {
      * @return object
      */
      public function getAll () {
-        $sql = "SELECT * FROM {$this->tableNames['priceLists']}";
-        $results = $this->db->ExecuteSelectQueryAndFetchAll($sql);
+        $sql = "SELECT * FROM {$this->tn['priceLists']}";
+        $this->db->execute($sql);
         // dump($results);
-        return $results;
+        return $this->db->fetchAll();
      }
 
 /*     public function insertNewInvoice($params) {
