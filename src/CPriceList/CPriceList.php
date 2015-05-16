@@ -26,7 +26,7 @@ class CPriceList {
      * @return object
      */
      public function getAll () {
-        $sql = "SELECT * FROM {$this->table}";
+        $sql = "SELECT id, Beskrivning FROM {$this->table}";
         $this->db->execute($sql);
         // dump($results);
         return $this->db->fetchAll();

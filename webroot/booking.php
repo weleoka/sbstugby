@@ -14,6 +14,7 @@ $db->connect();
 $tn = $roo['tableNames'];
 
 $bookings = new CBooking($db, $tn);
+$bookingCategory = new CBookingCategory($db, $tn);
 
 // GET parameters from URL.
 $category = isset($_GET['category']) ? $_GET['category'] : null;
@@ -40,7 +41,7 @@ if (is_numeric($category) && $category <= 3 && $category > 0) {
         $roo['title'] = "Boka skidor";
         $form = new CSkiiBooking($db, $tn);
     }
-    $categoryStr = $bookings->getCategoryStr($category);
+    $categoryStr = $bookingCategory->getCategoryStr($category);
     $form->makeForm($category);
     $formStr = $form->getHTML(); // ($formOptions);
 } else {

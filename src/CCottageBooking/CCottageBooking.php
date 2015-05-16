@@ -23,6 +23,7 @@ class CCottageBooking {
             $this->period = new CPeriod($db, $tn);
             $this->cottage = new CCottage($db, $tn);
             $this->bookingCategory = new CBookingCategory($db, $tn);
+            $this->calendar = new CCalendar($db, $tn);
     }
 
 
@@ -62,7 +63,7 @@ class CCottageBooking {
           $selectPersons[ $person->id ] = $person->Namn;
         }
 
-        $weeks = $this->period->getAllWeeks();
+        $weeks = $this->calendar->getAllWeeks();
         foreach ($weeks as $week) {
           $selectWeeks[ $week->id ] = $week->id;
         }
