@@ -111,31 +111,31 @@ $roo['navbar'] = array(
 $roo['database'] = require "config_mysql.php";
 
 $roo['tableNames'] = array(
-                                'bookings'=>'bokning',
+                                'booking'=>'bokning',
                                 'customer'=>'bokning_betalperson',
-                                'invoices'=>'bokning_faktura',
+                                'invoice'=>'bokning_faktura',
                                 'bookingCategory'=>'bokning_typ',
 
-                                'bikeBookings'=>'cykel_bokning',
-                                'bikeHelmets'=>'cykel_hjälm',
-                                'bikes'=>'cykel_instans',
+                                'bikeBooking'=>'cykel_bokning',
+                                'bikeHelmet'=>'cykel_hjälm',
+                                'bike'=>'cykel_instans',
                                 'bikeType'=>'cykel_typ',
 
-                                'bookingPeriod'=>'kal_period',
+                                'period'=>'kal_period',
                                 'priceClass'=>'kal_prisklass',
-                                'priceLists'=>'kal_prislista',
+                                'priceList'=>'kal_prislista',
                                 'calendarWeek'=>'kal_vecka',
 
                                 'person'=>'person',
 
-                                'skiiBookings'=>'skid_bokning',
-                                'skiiHelmets'=>'skid_hjälm',
-                                'skiiss'=>'skid_par',
-                                'skiiSticks'=>'skid_stav',
+                                'skiiBooking'=>'skid_bokning',
+                                'skiiHelmet'=>'skid_hjälm',
+                                'skiis'=>'skid_par',
+                                'skiiStick'=>'skid_stav',
                                 'skiiType'=>'skid_typ',
 
-                                'cottages'=>'stuga',
-                                'cottageBookings'=>'stuga_bokning',
+                                'cottage'=>'stuga',
+                                'cottageBooking'=>'stuga_bokning',
 );
 
 

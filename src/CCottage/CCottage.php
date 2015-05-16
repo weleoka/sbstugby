@@ -4,13 +4,16 @@
  */
 class CCottage {
 
+    protected $table;
+
   /*
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($db, $tableNames) {
+    public function __construct($db, $tn) {
         $this->db = $db; // new CDatabase($dbCredentials);
-        $this->tn = $tableNames;
+        $this->tn = $tn;
+        $this->table = $this->tn['cottage'];
     }
 
 
@@ -20,7 +23,7 @@ class CCottage {
      * @return object
      */
      public function getAll () {
-        $sql = "SELECT * FROM {$this->tn['cottages']}";
+        $sql = "SELECT * FROM {$this->table}";
         $this->db->execute($sql);
         // dump($results);
         return $this->db->fetchAll();
@@ -30,5 +33,15 @@ class CCottage {
       $aaa[$tag->tag] = $tag->tag;
     }
 */
+
+
+    /*
+     * Method that returns table name.
+     *
+     * @return string $this->table.
+     */
+    public function table() {
+        return $this->table;
+    }
 
 }

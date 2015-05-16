@@ -2,34 +2,38 @@
 
 
 /**
- * CPriceList, class that represents pricelists.
+ * CBookingCategory, class that represents billing.
  */
 
 
-class CPriceList {
+class CBookingCategory {
 
     protected $table;
+
   /*
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
     public function __construct($db, $tn) {
-        $this->db = $db; // new CDatabase($dbCredentials);
+        $this->db = $db;
         $this->tn = $tn;
-        $this->table = $this->tn['priceList'];
+        $this->table = $this->tn['bookingCategory'];
     }
 
-
     /*
-     * Gets all
+     * Gets category under specific id
      *
-     * @return object
+     * @param id
+     * @return string
      */
-     public function getAll () {
-        $sql = "SELECT * FROM {$this->table}";
-        $this->db->execute($sql);
-        // dump($results);
-        return $this->db->fetchAll();
+     public function getCategoryStr ($id) {
+        $sql = "SELECT Beskrivning FROM {$this->table} WHERE id = ?";
+
+        $params = array($id);
+        $this->db->execute($sql, $params);
+        $result = $this->db->fetchAll();
+
+        return $result[0]->Beskrivning;
      }
 
 
@@ -41,6 +45,20 @@ class CPriceList {
     public function table() {
         return $this->table;
     }
+
+    /*
+     * Gets all
+     *
+     * @return object
+     */
+/*     public function getAll () {
+        $sql = "SELECT {$this->tn['invoices']}.id,  {$this->tn['person']}.namn
+                    FROM {$this->tn['invoices']}, {$this->tn['person']}
+                    WHERE {$this->tn['invoices']}.id = {$this->tn['person']}.id";
+        $this->db->execute($sql);
+        // dump($results);
+        return $this->db->fetchAll();
+     }*/
 
 
 /*     public function insertNewInvoice($params) {

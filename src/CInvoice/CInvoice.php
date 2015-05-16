@@ -8,13 +8,16 @@
 
 class CInvoice {
 
+    protected $table;
+
   /*
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($db, $tableNames) {
+    public function __construct($db, $tn) {
         $this->db = $db; // new CDatabase($dbCredentials);
-        $this->tn = $tableNames;
+        $this->tn = $tn;
+        $this->table = $this->tn['invoice'];
     }
 
 
@@ -24,15 +27,24 @@ class CInvoice {
      * @return object
      */
      public function getAll () {
-        $sql = "SELECT {$this->tn['invoices']}.id,  {$this->tn['person']}.namn
-                    FROM {$this->tn['invoices']}, {$this->tn['person']}
-                    WHERE {$this->tn['invoices']}.id = {$this->tn['person']}.id";
+        $sql = "SELECT {$this->table}.id,  {$this->tn['person']}.namn
+                    FROM {$this->table}, {$this->tn['person']}
+                    WHERE {$this->table}.id = {$this->tn['person']}.id";
         $this->db->execute($sql);
         // dump($results);
         return $this->db->fetchAll();
      }
 
 
+
+    /*
+     * Method that returns table name.
+     *
+     * @return string $this->table.
+     */
+    public function table() {
+        return $this->table;
+    }
 /*     public function insertNewInvoice($params) {
         $output = '';
         $sql = "INSERT INTO {$this->tn['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)

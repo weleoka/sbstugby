@@ -13,6 +13,7 @@ $db->connect();
 $tn = $roo['tableNames'];
 
 $bookings = new CBooking($db, $tn);
+$bookingCategory = new CBookingCategory($db, $tn);
 
 // GET parameters from URL.
 // 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning
@@ -20,8 +21,15 @@ $category = isset($_GET['category']) ? $_GET['category'] : null;
 
 if (is_numeric($category)){
     $result = $bookings->getBookings($category);
+    $expandedResult = []; $i = 0;
+
+    foreach($result AS $key => $val) {
+        $i++;
+        $expandedResult[$i] = $bookings->expandBooking($val->id);
+    }
+    dump($expandedResult);
     $bokningar = $bookings->listBookings($result);
-    $categoryStr = $bookings->getCategoryStr($category) . "ar"; // Append "ar" for plural.
+    $categoryStr = $bookingCategory->getCategoryStr($category) . "ar"; // Append "ar" for plural.
 
 } else if ($category == 'all') {
     $bokningar = $bookings->getAllBookings();
@@ -43,6 +51,7 @@ $roo['main'] = <<<EOD
     <h1>{$categoryStr}</h1>
     <ul>
         {$bokningar}
+        {dump($expandedResult)}
     </ul>
 
 </article>

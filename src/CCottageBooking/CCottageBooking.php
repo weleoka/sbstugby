@@ -1,17 +1,19 @@
 <?php
 /**
- * CBooking_cottage, class that represents booking cottages.
+ * CCottageBooking, class that represents booking cottages.
  *
  */
-class CBooking_cottage {
+class CCottageBooking {
 
+    protected $table;
   /*
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($db, $tableNames) {
+    public function __construct($db, $tn) {
             $this->db = $db; // new CDatabase($dbCredentials);
-            $tn = $tableNames;
+            $this->tn = $tn;
+            $this->table = $this->tn['cottageBooking'];
             $this->form = new \Mos\HTMLForm\CForm();
 
             $this->person = new CPerson($db, $tn);
@@ -20,7 +22,9 @@ class CBooking_cottage {
             $this->booking = new CBooking($db, $tn);
             $this->period = new CPeriod($db, $tn);
             $this->cottage = new CCottage($db, $tn);
+            $this->bookingCategory = new CBookingCategory($db, $tn);
     }
+
 
 
     /*
@@ -165,16 +169,16 @@ class CBooking_cottage {
                     $cottageBookingParams = [
                         'Bokning_id'       => $this->db->LastInsertId(),
                         'Stuga_id'          => $form->Value('cottage'),
-                        'Person_01'       => $form->Value('person01'),
-                        'Person_02'       => $form->Value('person02'),
-                        'Person_03'       => $form->Value('person03'),
-                        'Person_04'       => $form->Value('person04'),
-                        'Person_05'       => $form->Value('person05'),
-                        'Person_06'       => $form->Value('person06'),
-                        'Person_07'       => $form->Value('person07'),
-                        'Person_08'       => $form->Value('person08'),
+                        'Person01'       => $form->Value('person01'),
+                        'Person02'       => $form->Value('person02'),
+                        'Person03'       => $form->Value('person03'),
+                        'Person04'       => $form->Value('person04'),
+                        'Person05'       => $form->Value('person05'),
+                        'Person06'       => $form->Value('person06'),
+                        'Person07'       => $form->Value('person07'),
+                        'Person08'       => $form->Value('person08'),
                     ];
-                    $res03 = $this->booking->insertNewCottageBooking($cottageBookingParams);
+                    $res03 = $this->insertNewCottageBooking($cottageBookingParams);
 
                     if ($res01 && $res02 && $res03) {
                         return true;
@@ -199,6 +203,28 @@ class CBooking_cottage {
         }
     }
 
+
+
+    /*
+     * Creates new content in db for a cottage booking
+     *
+     */
+    public function insertNewCottageBooking($params) {
+        $this->db->insert($this->table, $params);
+        // $sql = "INSERT INTO {$this->tn['cottageBookings']} (Bokning_id, Stuga_id, person01, person02, person03, person04, person05, person06, person07, person08, )
+           //         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        return $this->db->execute();
+    }
+
+
+    /*
+     * Method that returns table name.
+     *
+     * @return string $this->table.
+     */
+    public function table() {
+        return $this->table;
+    }
 
 }
 

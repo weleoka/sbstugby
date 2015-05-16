@@ -6,13 +6,15 @@
  */
 class CPerson {
 
+    protected $table;
   /*
    * Constructor that accepts $db credentials and creates CDatabase object
    *
    */
-    public function __construct($db, $tableNames) {
+    public function __construct($db, $tn) {
         $this->db = $db; // new CDatabase($dbCredentials);
-        $this->tn = $tableNames;
+        $this->tn = $tn;
+        $this->table = $this->tn['person'];
     }
 
 
@@ -22,7 +24,7 @@ class CPerson {
      * @return object
      */
      public function getAll () {
-        $sql = "SELECT * FROM {$this->tn['person']}";
+        $sql = "SELECT * FROM {$this->table}";
         $this->db->execute($sql);
         // dump($results);
         return $this->db->fetchAll();
@@ -32,5 +34,13 @@ class CPerson {
       $aaa[$tag->tag] = $tag->tag;
     }
 */
+    /*
+     * Method that returns table name.
+     *
+     * @return string $this->table.
+     */
+    public function table() {
+        return $this->table;
+    }
 
 }

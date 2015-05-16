@@ -32,13 +32,13 @@ $acronym = isset($_SESSION['user']) ? $_SESSION['user']->acronym : 1;
 if (is_numeric($category) && $category <= 3 && $category > 0) {
     if ($category == 1) {
         $roo['title'] = "Boka stuga";
-        $form = new CBooking_cottage($db, $tn);
+        $form = new CCottageBooking($db, $tn);
     } else if ($category == 2) {
         $roo['title'] = "Boka cykel";
-        $form = new CBooking_bike($db, $tn);
+        $form = new CBikeBooking($db, $tn);
     } else if ($category == 3) {
         $roo['title'] = "Boka skidor";
-        $form = new CBooking_skii($db, $tn);
+        $form = new CSkiiBooking($db, $tn);
     }
     $categoryStr = $bookings->getCategoryStr($category);
     $form->makeForm($category);
