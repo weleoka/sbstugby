@@ -45,9 +45,9 @@ class CBooking {
         $params = array($id);
         $this->db->execute($sql, $params);
         $result = $this->db->fetchAll();
+
         return $result[0]->Beskrivning;
      }
-
 
 
     /*
@@ -63,8 +63,6 @@ class CBooking {
         $result = $this->db->fetchAll();
 
         return $result;
-
-
     }
 
 

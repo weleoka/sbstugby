@@ -23,27 +23,28 @@ if (is_numeric($category)){
     $bokningar = $bookings->listBookings($result);
     $categoryStr = $bookings->getCategoryStr($category) . "ar"; // Append "ar" for plural.
 
-} else if ($category = 'all') {
+} else if ($category == 'all') {
     $bokningar = $bookings->getAllBookings();
     $categoryStr = "Alla bokningar";
 
 } else {
-    $categoryStr = "No category booking.";
-    $formStr = "No category found matching the criteria.";
+    $bokningar = "Välj kategori.";
+    $categoryStr = "Bokningshanteraren";
 }
 
 $roo['header'] .= '<span class="siteslogan">Aktuella bokningar</span>';
 
 $roo['main'] = <<<EOD
 <article>
+    <a href='view.php?category=1'>Stuga</a> 
+    <a href='view.php?category=2'>Cykel</a> 
+    <a href='view.php?category=3'>Skidor</a> 
+    <a href='view.php?category=all'>Alla</a> 
     <h1>{$categoryStr}</h1>
     <ul>
         {$bokningar}
     </ul>
-    <p><a href='view.php?category=1'>Stuga</a></p>
-    <p><a href='view.php?category=2'>Cykel</a></p>
-    <p><a href='view.php?category=3'>Skidor</a></p>
-    <p><a href='view.php?category=all'>Alla</a></p>
+
 </article>
 EOD;
 

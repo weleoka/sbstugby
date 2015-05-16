@@ -51,7 +51,7 @@ $roo = array();
  *
  */
 $roo['lang']         = 'sv';
-$roo['title_append'] = ' | SB';
+$roo['title_append'] = ' | SB Semesterbyar';
 
 $title = htmlentities(isset($_GET['title']) ? $_GET['title'] : null);
 

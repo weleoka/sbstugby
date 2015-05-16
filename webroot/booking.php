@@ -7,9 +7,6 @@
 // Include the config-file which also creates the $roo variable with its defaults.
 include(__DIR__.'/config.php');
 
-// Save variables in Roo container
-$roo['title'] = "Boka";
-
 $db = new \Mos\Database\CDatabaseBasic();
 $db->setOptions($roo['database']);
 $db->connect();
@@ -21,26 +18,35 @@ $bookings = new CBooking($db, $tn);
 // GET parameters from URL.
 $category = isset($_GET['category']) ? $_GET['category'] : null;
 
-// POST, from form below, parameters
+// User.
 $acronym = isset($_SESSION['user']) ? $_SESSION['user']->acronym : 1;
 
-if (is_numeric($category)){
+/*$formOptions = [
+    'start'          => false,  // Only return the start of the form element
+    'columns'        => 3,      // Layout all elements in one column
+    'use_buttonbar'  => true,   // Layout consequtive buttons as one element wrapped in <p>
+    'use_fieldset'   => true,   // Wrap form fields within <fieldset>
+    'legend'         => 'booking',   // Use legend for fieldset
+];*/
 
-    if ($category = 1) {
+if (is_numeric($category) && $category <= 3 && $category > 0) {
+    if ($category == 1) {
+        $roo['title'] = "Boka stuga";
         $form = new CBooking_cottage($db, $tn);
-    } else if ($category = 2) {
+    } else if ($category == 2) {
+        $roo['title'] = "Boka cykel";
         $form = new CBooking_bike($db, $tn);
-    } else if ($category = 3) {
+    } else if ($category == 3) {
+        $roo['title'] = "Boka skidor";
         $form = new CBooking_skii($db, $tn);
     }
-    $form->makeForm($category);
-
     $categoryStr = $bookings->getCategoryStr($category);
-    $formStr = $form->getHTML();
-
+    $form->makeForm($category);
+    $formStr = $form->getHTML(); // ($formOptions);
 } else {
-    $categoryStr = "No category booking.";
-    $formStr = "No category found matching the criteria.";
+    $roo['title'] = "Kategorifel";
+    $categoryStr = "Fel i bokningskategorin.";
+    $formStr = "Ingen kategori hittades under det id:et..";
 }
 
 $roo['header'] .= '<span class="siteslogan">' . $categoryStr . '!</span>';
@@ -48,7 +54,6 @@ $roo['header'] .= '<span class="siteslogan">' . $categoryStr . '!</span>';
 $roo['main'] = <<<EOD
 <article>
     <h1>{$categoryStr}</h1>
-    Skapa ny betalperson?
     {$formStr}
 </article>
 EOD;
