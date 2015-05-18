@@ -54,29 +54,32 @@ class CBooking {
 
 SELECT
     Bokning.id,
-    Bokning_typ.Beskrivning,
-    Bokning_faktura.Betalperson_id,
+    Bokning_typ.Beskrivning AS Bokningstyp,
     Kal_period.Vecka_start,
     Kal_period.Vecka_slut,
-    Kal_prislista.Beskrivning
+    Kal_prislista.Beskrivning AS Prislista,
+    Person.Namn AS Betalperson
 FROM 
     Bokning,
     Bokning_faktura,
     Bokning_typ,
     Kal_prislista,
-    Kal_period
+    Kal_period,
+    Person
 WHERE 
-    Bokning.id = ? AND
+    Bokning.id = 3 AND
     Bokning.Bokning_faktura_id = Bokning_faktura.id AND
     Bokning.Kal_prislista_id = Kal_prislista.id AND
     Bokning.Kal_period_id = Kal_period.id AND
-    Bokning.Bokning_typ_id = Bokning_typ.id;";
+    Bokning.Bokning_typ_id = Bokning_typ.id AND
+    Bokning_faktura.Betalperson_id = Person.id;";
 
         $this->db->execute($sql, $params);
         $result = $this->db->fetchAll();
 
         return $result;
     }
+
 
    /*
      * Get all bookings regardless of category.

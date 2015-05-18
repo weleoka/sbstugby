@@ -8,6 +8,6 @@ return [
     'table_prefix'    => "",
 //    'fetch_mode'      => \PDO::FETCH_OBJ,
 //    'session_key'     => 'CDatabase',
-    'verbose' => true,
+ //   'verbose' => true,
 //    'debug_connect' => 'true',
 ];
