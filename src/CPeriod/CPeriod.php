@@ -28,10 +28,10 @@ class CPeriod {
     }
 
     public function insertNewPeriod($params) {
-        $this->db->insert($this->table, $params);
-        // $sql = "INSERT INTO {$this->tn['bookingPeriod']} (Vecka_start, Vecka_slut)
-           //          VALUES (?, ?);";
-        return $this->db->execute();
+        // $this->db->insert($this->table, $params);
+        $sql = "INSERT INTO {$this->table} (Vecka_start, Vecka_slut)
+                  VALUES (?, ?);";
+        return $this->db->execute($sql, $params);
     }
 
     /*

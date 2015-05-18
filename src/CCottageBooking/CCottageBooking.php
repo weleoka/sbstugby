@@ -147,8 +147,8 @@ class CCottageBooking {
                     // PDO::beginTransaction()
                     // 'timestamp'     => getTime(),
 
-                    // $sql = "START TRANSACTION;";
-                    // $this->db->execute($sql);
+                    $sql = "START TRANSACTION;";
+                    $this->db->execute($sql);
                     $output = 'Started transaction: ';
 
                     $periodParams = [
@@ -156,8 +156,7 @@ class CCottageBooking {
                         'Vecka_slut'        => $form->Value('last_week'),
                     ];
                     $res01 = $this->period->insertNewPeriod($periodParams);
-                    // $newId = $this->db->LastInsertId(); // ->LAST_INSERT_ID();
-                    // dump($newId);
+
                     $bookingParams = [
                         'Bokning_faktura_id'=> $form->Value('invoice'),
                         'Kal_prislista_id'      => $form->Value('priceList'),
@@ -182,12 +181,16 @@ class CCottageBooking {
                     $res03 = $this->insertNewCottageBooking($cottageBookingParams);
 
                     if ($res01 && $res02 && $res03) {
+                        $sql = "COMMIT;";
+                        $res = $this->db->execute($sql);
                         return true;
                     } else {
+                        $sql = "ROLLBACK;";
+                        $res = $this->db->execute($sql);
                         print("First: " . $res01 . " Second: " . $res02 . " Third: " . $res03);
+                        return false;
                     }
-                    // $sql = "COMMIT;";
-                    // $res = $this->db->execute($sql);
+
 
                 }
             ],

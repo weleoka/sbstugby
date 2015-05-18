@@ -19,15 +19,18 @@ $bookingCategory = new CBookingCategory($db, $tn);
 // 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning
 $category = isset($_GET['category']) ? $_GET['category'] : null;
 
+$expandedResultStr = "";
+
 if (is_numeric($category)){
     $result = $bookings->getBookings($category);
-    $expandedResult = []; $i = 0;
+    $expandedResultArr = []; $i = 0;
 
     foreach($result AS $key => $val) {
         $i++;
-        $expandedResult[$i] = $bookings->expandBooking($val->id);
+        $expandedResultArr[$i] = $bookings->expandBooking($val->id);
     }
-    dump($expandedResult);
+
+    $expandedResultStr = dump($expandedResultArr);
     $bokningar = $bookings->listBookings($result);
     $categoryStr = $bookingCategory->getCategoryStr($category) . "ar"; // Append "ar" for plural.
 
@@ -51,7 +54,7 @@ $roo['main'] = <<<EOD
     <h1>{$categoryStr}</h1>
     <ul>
         {$bokningar}
-        {dump($expandedResult)}
+        {$expandedResultStr}
     </ul>
 
 </article>
