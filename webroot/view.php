@@ -19,27 +19,26 @@ $bookingCategory = new CBookingCategory($db, $tn);
 // 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning
 $category = isset($_GET['category']) ? $_GET['category'] : null;
 
-$expandedResultStr = "";
-
 if (is_numeric($category)){
-    $result = $bookings->getBookings($category);
-    $expandedResultArr = []; $i = 0;
-
-    foreach($result AS $key => $val) {
-        $i++;
-        $expandedResultArr[$i] = $bookings->expandBooking($val->id);
-    }
-
-    $expandedResultStr = dump($expandedResultArr);
-    $bokningar = $bookings->listBookings($result);
+    // get name of category.
     $categoryStr = $bookingCategory->getCategoryStr($category) . "ar"; // Append "ar" for plural.
 
+    // query db for bookings.
+    $result = $bookings->getBookings($category);
+    $joinedResult = $bookings->getJoinedBookings($category);
+
+    // dump($result);
+    // dump($joinedResult);
+
+    $bookingsStr = $bookings->listBookings($result);
+    $joinedBookingsStr = $bookings->listJoinedBookings($joinedResult);
+
 } else if ($category == 'all') {
-    $bokningar = $bookings->getAllBookings();
+    $bookingsStr = $bookings->getAllBookings();
     $categoryStr = "Alla bokningar";
 
 } else {
-    $bokningar = "Välj kategori.";
+    $bookingsStr = "Välj kategori.";
     $categoryStr = "Bokningshanteraren";
 }
 
@@ -53,8 +52,8 @@ $roo['main'] = <<<EOD
     <a href='view.php?category=all'>Alla</a> 
     <h1>{$categoryStr}</h1>
     <ul>
-        {$bokningar}
-        {$expandedResultStr}
+        {$bookingsStr}
+        {$joinedBookingsStr}
     </ul>
 
 </article>

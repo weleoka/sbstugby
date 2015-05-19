@@ -22,13 +22,30 @@ class CBooking {
 
 
     /*
+     * Gets a booking with specific id
+     *
+     * @param integer $id the booking category id
+     * @return resultset
+     */
+    public function getBooking($id) {
+        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
+        $params = array($id);
+
+        $this->db->execute($sql, $params);
+        $result = $this->db->fetch();
+
+        return $result;
+     }
+
+
+    /*
      * Get bookings under certain category.
      *
      * @return array with resultset
      */
     public function getBookings($category) {
-        $sql = "SELECT * FROM {$this->table} WHERE Bokning_typ_id = ?";
         $params = array($category);
+        $sql = "SELECT * FROM {$this->table} WHERE Bokning_typ_id = ?";
 
         $this->db->execute($sql, $params);
         $result = $this->db->fetchAll();
@@ -40,38 +57,29 @@ class CBooking {
     /*
      * Expand the booking giving full detals.
      *
-     * @param integer $bookingId the booking to expand.
-     // * @param integer $category the booking category.
+     * @param integer $category of booking to fetch.
      * @return array with resultset
      */
-    public function expandBooking($bookingId) {
-        $params = array($bookingId);
-/*            $listHTML .= $val->Bokning_faktura_id . "(faktura), ";
-            $listHTML .= $val->Kal_prislista_id . "(prislista), ";
-            $listHTML .= $val->Kal_period_id . "(period), ";
-            $listHTML .= $val->Bokning_typ_id . "(typ).";*/
+    public function getJoinedBookings($category) {
+        $params = array($category);
         $sql = "
-
 SELECT
     Bokning.id,
-    Bokning_typ.Beskrivning AS Bokningstyp,
     Kal_period.Vecka_start,
     Kal_period.Vecka_slut,
     Kal_prislista.Beskrivning AS Prislista,
     Person.Namn AS Betalperson
-FROM 
+FROM
     Bokning,
     Bokning_faktura,
-    Bokning_typ,
     Kal_prislista,
     Kal_period,
     Person
-WHERE 
-    Bokning.id = 3 AND
+WHERE
+    Bokning.Bokning_typ_id = ? AND
     Bokning.Bokning_faktura_id = Bokning_faktura.id AND
     Bokning.Kal_prislista_id = Kal_prislista.id AND
     Bokning.Kal_period_id = Kal_period.id AND
-    Bokning.Bokning_typ_id = Bokning_typ.id AND
     Bokning_faktura.Betalperson_id = Person.id;";
 
         $this->db->execute($sql, $params);
@@ -111,11 +119,11 @@ WHERE
 
         foreach($result AS $key => $val) {
             $listHTML .= "<li>";
-            $listHTML .= $val->id . "(id), ";
-            $listHTML .= $val->Bokning_faktura_id . "(faktura), ";
-            $listHTML .= $val->Kal_prislista_id . "(prislista), ";
-            $listHTML .= $val->Kal_period_id . "(period), ";
-            $listHTML .= $val->Bokning_typ_id . "(typ).";
+            $listHTML .= $val->id . " (id), ";
+            $listHTML .= $val->Bokning_faktura_id . " (faktura), ";
+            $listHTML .= $val->Kal_prislista_id . " (prislista), ";
+            $listHTML .= $val->Kal_period_id . " (period), ";
+            $listHTML .= $val->Bokning_typ_id . " (typ).";
             $listHTML .= " ( ";
             $listHTML .= "<a href=\"delete.php?id=$val->id\"> Ta bort</a> )";
             $listHTML .= "</li>";
@@ -126,20 +134,28 @@ WHERE
 
 
     /*
-     * Gets a booking with specific id
+     * List joined resultset in HTML.
      *
-     * @param integer $id the booking category id
-     * @return resultset
+     * @param $result the resultset from db query.
+     * @return string with html to display content
      */
-    public function getBooking($id) {
-        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
-        $params = array($id);
+    public function listJoinedBookings($result) {
+        $listHTML = "";
 
-        $this->db->execute($sql, $params);
-        $result = $this->db->fetchAll();
+        foreach($result AS $key => $val) {
+            $listHTML .= "<li>";
+            $listHTML .= $val->id . ": ";
+            $listHTML .= $val->Vecka_start . " (Startvecka), ";
+            $listHTML .= $val->Vecka_slut . " (Slutvecka), ";
+            $listHTML .= $val->Prislista . ", ";
+            $listHTML .= $val->Betalperson . ".";
+            $listHTML .= " ( ";
+            $listHTML .= "<a href=\"delete.php?id=$val->id\"> Ta bort</a> )";
+            $listHTML .= "</li>";
+        }
 
-        return $result;
-     }
+        return $listHTML;
+    }
 
 
     /*

@@ -13,6 +13,7 @@ Built by Kai Weeks
 ### Notes and code issues
 Working after the ORM principles. Considering making a v2 of SBStugby not using ORM!
 
+Trouble with the longer queries and the tokens not being filled in by params arriving at the PDO->execute.
 
 ### License
 
