@@ -14,7 +14,7 @@ class CCottageBooking {
             $this->db = $db; // new CDatabase($dbCredentials);
             $this->tn = $tn;
             $this->table = $this->tn['cottageBooking'];
-            $this->form = new \Mos\HTMLForm\CForm();
+
 
             $this->person = new CPerson($db, $tn);
             $this->invoice = new CInvoice($db, $tn);
@@ -46,8 +46,6 @@ class CCottageBooking {
      */
     public function makeForm ($categoryCode) {
 
-        $form = $this->form;
-
         $invoices = $this->invoice->getAll();
         foreach ($invoices as $invoice) {
           $selectInvoices[ $invoice->id ] = $invoice->namn;
@@ -73,7 +71,7 @@ class CCottageBooking {
           $selectCottages[ $cottage->id ] = $cottage->id;
         }
 
-        $form = $this->form->create([], [
+        $this->form = new \Mos\HTMLForm\CForm([],[
             'invoice' => [
                         'type'      => 'select',
                         'label'      => 'Välj Faktura: ',
@@ -197,7 +195,7 @@ class CCottageBooking {
         ]);
 
         // Check the status of the form.
-        $status = $form->check();
+        $status = $this->form->check();
 
         if ($status === true) {
             print('Bokningen genomfördes');

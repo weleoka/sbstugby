@@ -32,6 +32,7 @@ function myExceptionHandler($exception) {
 set_exception_handler('myExceptionHandler');
 
 
+
 /**
  * Autoloader for classes.
  *
@@ -42,8 +43,8 @@ function myAutoloader($class) {
     include($path);
   }
   else {
-    throw new Exception("Classfile '{$class}' does not exists.");
-    echo ($path);
+   //  throw new Exception("Classfile '{$class}' does not exists.");
+    // echo ($path);
   }
 }
 spl_autoload_register('myAutoloader');
