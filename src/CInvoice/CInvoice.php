@@ -11,8 +11,7 @@ class CInvoice {
     protected $table;
 
   /*
-   * Constructor that accepts $db credentials and creates CDatabase object
-   *
+   * Constructor
    */
     public function __construct($db, $tn) {
         $this->db = $db; // new CDatabase($dbCredentials);

@@ -10,7 +10,7 @@ class CPriceList {
 
     protected $table;
   /*
-   * Constructor that accepts $db credentials and creates CDatabase object
+   * Constructor
    *
    */
     public function __construct($db, $tn) {
@@ -26,7 +26,7 @@ class CPriceList {
      * @return object
      */
      public function getAll () {
-        $sql = "SELECT id, Beskrivning FROM {$this->table}";
+        $sql = "SELECT * FROM {$this->table}";
         $this->db->execute($sql);
         // dump($results);
         return $this->db->fetchAll();

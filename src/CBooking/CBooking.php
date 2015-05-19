@@ -9,11 +9,11 @@ class CBooking {
     protected $table;
 
   /*
-   * Constructor that accepts $db credentials and creates CDatabase object
+   * Constructor
    *
    */
     public function __construct($db, $tn) {
-        $this->db = $db; //new CDatabase($dbCredentials);
+        $this->db = $db;
         $this->tn = $tn;
         $this->table = $this->tn['booking'];
 
@@ -67,7 +67,7 @@ SELECT
     Bokning.id,
     Kal_period.Vecka_start,
     Kal_period.Vecka_slut,
-    Kal_prislista.Beskrivning AS Prislista,
+    Kal_prislista.Kal_prislistaStr AS Prislista,
     Person.Namn AS Betalperson
 FROM
     Bokning,

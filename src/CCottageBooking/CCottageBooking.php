@@ -7,11 +7,11 @@ class CCottageBooking {
 
     protected $table;
   /*
-   * Constructor that accepts $db credentials and creates CDatabase object
+   * Constructor
    *
    */
     public function __construct($db, $tn) {
-            $this->db = $db; // new CDatabase($dbCredentials);
+            $this->db = $db;
             $this->tn = $tn;
             $this->table = $this->tn['cottageBooking'];
 
@@ -53,7 +53,7 @@ class CCottageBooking {
 
         $priceLists = $this->priceList->getAll();
         foreach ($priceLists as $priceList) {
-          $selectPriceLists[ $priceList->id ] = $priceList->Beskrivning;
+          $selectPriceLists[ $priceList->id ] = $priceList->Kal_prislistaStr;
         }
 
         $persons = $this->person->getAll();
