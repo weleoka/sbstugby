@@ -11,7 +11,7 @@ Built by Kai Weeks
 
 
 ### Notes and code issues
-Working after the ORM principles. Considering making a v2 of SBStugby not using ORM!
+Working after the ORM principles, but limited.
 
 
 ### License

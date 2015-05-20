@@ -147,26 +147,26 @@ class CCottageBooking {
 
                     $sql = "START TRANSACTION;";
                     $this->db->execute($sql);
-                    $output = 'Started transaction: ';
 
                     $periodParams = [
                         'Vecka_start'      => $form->Value('first_week'),
                         'Vecka_slut'        => $form->Value('last_week'),
                     ];
-                    $res01 = $this->period->insertNewPeriod($periodParams);
+                    $this->db->insert($this->period->table(), $periodParams);
+                    $res01 = $this->db->execute();
 
                     $bookingParams = [
                         'Bokning_faktura_id'=> $form->Value('invoice'),
                         'Kal_prislista_id'      => $form->Value('priceList'),
                         'Kal_period_id'         => $this->db->LastInsertId(),
                         'Bokning_typ_id'      => $categoryCode,
-
                     ];
-                    $res02 = $this->booking->insertNewBooking($bookingParams);
+                    $this->db->insert($this->booking->table(), $bookingParams);
+                    $res02 = $this->db->execute();
 
                     $cottageBookingParams = [
-                        'Bokning_id'       => $this->db->LastInsertId(),
-                        'Stuga_id'          => $form->Value('cottage'),
+                        'Bokning_id'     => $this->db->LastInsertId(),
+                        'Stuga_id'        => $form->Value('cottage'),
                         'Person01'       => $form->Value('person01'),
                         'Person02'       => $form->Value('person02'),
                         'Person03'       => $form->Value('person03'),
@@ -176,7 +176,8 @@ class CCottageBooking {
                         'Person07'       => $form->Value('person07'),
                         'Person08'       => $form->Value('person08'),
                     ];
-                    $res03 = $this->insertNewCottageBooking($cottageBookingParams);
+                    $this->db->insert($this->table, $cottageBookingParams);
+                    $res03 = $this->db->execute();
 
                     if ($res01 && $res02 && $res03) {
                         $sql = "COMMIT;";
@@ -206,19 +207,6 @@ class CCottageBooking {
     }
 
 
-
-    /*
-     * Creates new content in db for a cottage booking
-     *
-     */
-    public function insertNewCottageBooking($params) {
-        $this->db->insert($this->table, $params);
-        // $sql = "INSERT INTO {$this->tn['cottageBookings']} (Bokning_id, Stuga_id, person01, person02, person03, person04, person05, person06, person07, person08, )
-           //         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        return $this->db->execute();
-    }
-
-
     /*
      * Method that returns table name.
      *
@@ -229,24 +217,3 @@ class CCottageBooking {
     }
 
 }
-
-  /*
-
-   <form method=post>
-      <fieldset>
-            <legend>Uppdatera innehåll</legend>
-                <p><label>Titel:<br/><input type='text' name='title' value='{$title}'/></label></p>
-                <p><label>Text:<br/><textarea name='data'>{$data}</textarea></label></p>
-                <p><label>Filter:<br/><input type='text' name='filter' value='{$filter}'/></label></p>
-                <p><label>Publiseringsdatum:<br/><input type='text' name='published' value='{$published}'/></label></p>
-                <p class=buttons>
-                    <input type='submit' name='save' value='Spara'/>
-                    <input type='submit' name='delete' value='Radera'/>
-                    <input type='reset' value='Återställ'/></p>
-
-                <a href='view.php'>Visa alla</a></p>
-                <output>{$output}</output>
-        </fieldset>
-    </form>
-
-    */

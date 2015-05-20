@@ -18,6 +18,13 @@ $bookingCategory = new CBookingCategory($db, $tn);
 // GET parameters from URL.
 // 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning
 $category = isset($_GET['category']) ? $_GET['category'] : null;
+$criteria = [
+                'id'            => null,
+                'category' => null,
+                'paid'         => null,
+                'customer' => 2,
+];
+
 
 if (is_numeric($category)){
     // get name of category.
@@ -26,12 +33,16 @@ if (is_numeric($category)){
     // query db for bookings.
     $result = $bookings->getBookings($category);
     $joinedResult = $bookings->getJoinedBookings($category);
+    $searchedResult = $bookings->findBookings($criteria);
 
     // dump($result);
     // dump($joinedResult);
+    // dump($searchedResult);
 
     $bookingsStr = $bookings->listBookings($result);
     $joinedBookingsStr = $bookings->listJoinedBookings($joinedResult);
+    $searchedBookingsStr= $bookings->listJoinedBookings($searchedResult);
+    //$searchedBookingsStr = $bookings->listSearchedBookings($searchedResult, $criteria);
 
 } else if ($category == 'all') {
     $bookingsStr = $bookings->getAllBookings();
@@ -54,6 +65,7 @@ $roo['main'] = <<<EOD
     <ul>
         {$bookingsStr}
         {$joinedBookingsStr}
+        {$searchedBookingsStr}
     </ul>
 
 </article>
