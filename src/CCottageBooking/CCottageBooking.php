@@ -61,10 +61,10 @@ class CCottageBooking {
           $selectPersons[ $person->id ] = $person->Namn;
         }
 
-        $weeks = $this->calendar->getAllWeeks();
+/*        $weeks = $this->calendar->getAllWeeks();
         foreach ($weeks as $week) {
           $selectWeeks[ $week->id ] = $week->id;
-        }
+        }*/
 
         $cottages = $this->cottage->getAll();
         foreach ($cottages as $cottage) {
@@ -82,15 +82,13 @@ class CCottageBooking {
                         'label'      => 'Välj prislista: ',
                         'options'  => $selectPriceLists,
             ],
-            'first_week' => [
-                        'type'      => 'select',
-                        'label'      => 'Välj startvecka: ',
-                        'options'  => $selectWeeks,
-            ],
+            'first_week' => array(
+                        'type'        => 'week',
+                        'label' => 'Välj startvecka.',
+            ),
             'last_week' => [
-                        'type'      => 'select',
+                        'type'      => 'week',
                         'label'      => 'Välj slutvecka: ',
-                        'options'  => $selectWeeks,
             ],
             'cottage' => [
                         'type'      => 'select',
@@ -149,8 +147,9 @@ class CCottageBooking {
                     $this->db->execute($sql);
 
                     $periodParams = [
-                        'Vecka_start'      => $form->Value('first_week'),
-                        'Vecka_slut'        => $form->Value('last_week'),
+                        'Vecka_start'      => $form->Value('first_week'), // HTML 5 gives format like this: 2015-W51
+                        'Vecka_slut'        => $form->Value('last_week'),   // Need to alter table to store that
+                                                                                                // and write method to substr() it for price calcs.
                     ];
                     $this->db->insert($this->period->table(), $periodParams);
                     $res01 = $this->db->execute();
