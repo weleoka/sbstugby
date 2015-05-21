@@ -66,9 +66,15 @@ class CCottageBooking {
           $selectWeeks[ $week->id ] = $week->id;
         }*/
 
-        $cottages = $this->cottage->getAll();
+        $cottages = $this->cottage->getJoinedAll();
+        dump($cottages);
         foreach ($cottages as $cottage) {
-          $selectCottages[ $cottage->id ] = $cottage->id;
+          $cottageStr = "(" . $cottage->id
+                             . ") adr.: " . $cottage->Adress
+                             . " sover: " . $cottage->Bäddar
+                             . " utrstng.: " . $cottage->Stuga_utrustningStr
+                             . " kksndrd.: " . $cottage->Stuga_köksstandardStr;
+          $selectCottages[ $cottage->id ] = $cottageStr;
         }
 
         $this->form = new \Mos\HTMLForm\CForm([],[

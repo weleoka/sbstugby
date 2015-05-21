@@ -20,19 +20,37 @@ class CCottage {
     /*
      * Gets all
      *
-     * @return object
+     * @return resultset
      */
      public function getAll () {
         $sql = "SELECT * FROM {$this->table}";
         $this->db->execute($sql);
-        // dump($results);
+
         return $this->db->fetchAll();
      }
-/*
-    foreach ($tags as $tag) {
-      $aaa[$tag->tag] = $tag->tag;
-    }
-*/
+
+
+    /*
+     * Gets all
+     *
+     * @return resultset
+     */
+     public function getJoinedAll () {
+        $sql = "
+SELECT
+    *
+FROM
+    Stuga,
+    Stuga_Utrustning,
+    Stuga_Köksstandard
+WHERE
+    Stuga.id = 1 AND
+    Stuga.Stuga_utrustning_id = Stuga_utrustning.id AND
+    Stuga.Stuga_köksstandard_id = Stuga_köksstandard.id;";
+        $this->db->execute($sql);
+
+        return $this->db->fetchAll();
+     }
 
 
     /*

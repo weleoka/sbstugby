@@ -67,7 +67,7 @@ $roo['header'] = <<<EOD
 	<span class='sitetitle'>SB Semesterbyar</span>
 EOD;
 
-
+$sdf = date(DATE_RFC2822);
 $roo['footer'] = <<<EOD
 	<footer>
 		<span class='sitefooter'>
@@ -75,6 +75,7 @@ $roo['footer'] = <<<EOD
 			<a href='https://github.com'>GitHub</a> |
 			<a href='http://validator.w3.org/unicorn/check?ucn_uri=referer&amp;ucn_task=conformance'>Unicorn</a> |
 			<a href="http://validator.w3.org/check/referer">HTML5</a>
+			<br>{$sdf}
 		</span>
 	</footer>
 EOD;
