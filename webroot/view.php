@@ -16,42 +16,45 @@ $bookings = new CBooking($db, $tn);
 $bookingCategory = new CBookingCategory($db, $tn);
 
 // GET parameters from URL.
-// 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning
-$category = isset($_GET['category']) ? $_GET['category'] : null;
+// category: 1 = stugbokning, 2 = cykelbokning, 3 = skidbokning
+
 $criteria = [
-                'id'            => null,
-                'category' => null,
-                'paid'         => null,
-                'customer' => 2,
+    'id'            =>  isset($_GET['id']) ? $_GET['id'] : null,
+    'category'  => isset($_GET['category']) ? $_GET['category'] : null,
+    'paid'         =>  isset($_GET['paid']) ? $_GET['paid'] : null,
+    'customer' => isset($_GET['customer']) ? $_GET['customer'] : null,
 ];
 
+$html = "<h1>Bokningshanteraren</h1>";
 
-if (is_numeric($category)){
-    // get name of category.
-    $categoryStr = $bookingCategory->getCategoryStr($category) . "ar"; // Append "ar" for plural.
-
+// Make the header name of category.
+if (is_numeric($criteria['category'])){
+    // Make relevant header.
+    $html .= "<h1>" . $bookingCategory->getCategoryStr($criteria['category']) . "ar</h1>"; // Append "ar" for plural.
     // query db for bookings.
-    $result = $bookings->getBookings($category);
-    $joinedResult = $bookings->getJoinedBookings($category);
     $searchedResult = $bookings->findBookings($criteria);
-
-    // dump($result);
-    // dump($joinedResult);
-    // dump($searchedResult);
-
-    $bookingsStr = $bookings->listBookings($result);
-    $joinedBookingsStr = $bookings->listJoinedBookings($joinedResult);
-    $searchedBookingsStr= $bookings->listJoinedBookings($searchedResult);
-    //$searchedBookingsStr = $bookings->listSearchedBookings($searchedResult, $criteria);
-
-} else if ($category == 'all') {
-    $bookingsStr = $bookings->getAllBookings();
-    $categoryStr = "Alla bokningar";
+    // Make html from the resutset.
+    $html .= $bookings->listSearchedBookings($searchedResult);
 
 } else {
-    $bookingsStr = "Välj kategori.";
-    $categoryStr = "Bokningshanteraren";
+    for ($i = 1; $i <= 3; $i++) {
+        $criteria['category'] = $i;
+        // Make relevant header.
+        $html .= "<h1>" . $bookingCategory->getCategoryStr($criteria['category']) . "ar</h1>"; // Append "ar" for plural.
+        // query db for bookings.
+        $searchedResult = $bookings->findBookings($criteria);
+        // List resultset.
+        $html .= $bookings->listSearchedBookings($searchedResult);
+    }
 }
+
+/*if (is_null($criteria['category'])) {
+    $html = $bookings->getAllBookings();
+    $categoryStr = "Alla bokningar";
+
+} */
+
+
 
 $roo['header'] .= '<span class="siteslogan">Aktuella bokningar</span>';
 
@@ -60,12 +63,9 @@ $roo['main'] = <<<EOD
     <a href='view.php?category=1'>Stuga</a> 
     <a href='view.php?category=2'>Cykel</a> 
     <a href='view.php?category=3'>Skidor</a> 
-    <a href='view.php?category=all'>Alla</a> 
-    <h1>{$categoryStr}</h1>
+    <a href='view.php'>Alla</a> 
     <ul>
-        {$bookingsStr}
-        {$joinedBookingsStr}
-        {$searchedBookingsStr}
+        {$html}
     </ul>
 
 </article>

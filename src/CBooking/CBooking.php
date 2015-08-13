@@ -139,7 +139,7 @@ WHERE
      * @param $result the resultset from db query.
      * @return string with html to display content
      */
-    public function listJoinedBookings($result) {
+    public function listSearchedBookings($result) {
         $listHTML = "";
 
         foreach($result AS $key => $val) {
@@ -185,24 +185,20 @@ WHERE
 
 
     /*
-     * Expand the booking giving full detals.
+     * Search for bookings using criteria.
      *
-     * @param object $criteria search criteria
+     * @param object $criteria. Attributes: id, category, paid, customer.
      * @return array with resultset
      */
     public function findBookings($criteria) {
+        $params = [];
         $i = 0;
         foreach($criteria AS $searchItem ) {
-            $i++;
-            if (isset($searchItem)) {
+            if (!is_null($searchItem)) {
                 $params[$i] = $searchItem;
             }
+            $i++;
         }
-/*        $params = array($criteria['id'],
-                                  $criteria['category'],
-                                  $criteria['paid'],
-                                  $criteria['customer']
-        );*/
 
         $sql = "
 SELECT
@@ -223,16 +219,16 @@ WHERE
     Bokning.Kal_period_id = Kal_period.id AND
     Bokning_faktura.Betalperson_id = Person.id";
 
-        if (isset($criteria['id'])) {
+        if (!is_null($criteria['id'])) {
             $sql .= "\nAND Bokning.id = ?";
         }
-        if (isset($criteria['category'])) {
+        if (!is_null($criteria['category'])) {
             $sql .= "\nAND Bokning.Bokning_typ_id = ?";
         }
-        if (isset($criteria['paid'])) {
+        if (!is_null($criteria['paid'])) {
             $sql .= "\nAND Bokning_faktura.betald != NULL";
         }
-        if (isset($criteria['customer'])) {
+        if (!is_null($criteria['customer'])) {
             $sql .= "\nAND Bokning_faktura.Betalperson_id = ?";
         }
 
