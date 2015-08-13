@@ -1,9 +1,9 @@
 <?php
 /**
- * CCottageBooking, class that represents booking cottages.
+ * CSkiiBooking, class that represents booking skiis.
  *
  */
-class CCottageBooking {
+class CSkiiBooking {
 
     protected $table;
   /*
@@ -13,7 +13,7 @@ class CCottageBooking {
     public function __construct($db, $tn) {
             $this->db = $db;
             $this->tn = $tn;
-            $this->table = $this->tn['cottageBooking'];
+            $this->table = $this->tn['skiiBooking'];
 
 
             $this->person = new CPerson($db, $tn);
@@ -21,6 +21,7 @@ class CCottageBooking {
             $this->priceList = new CPriceList($db, $tn);
             $this->booking = new CBooking($db, $tn);
             $this->period = new CPeriod($db, $tn);
+            $this->cottage = new CCottage($db, $tn);
             $this->bookingCategory = new CBookingCategory($db, $tn);
             $this->calendar = new CCalendar($db, $tn);
     }
@@ -65,21 +66,9 @@ class CCottageBooking {
           $selectWeeks[ $week->id ] = $week->id;
         }*/
 
-        $sql = "
-SELECT
-    *
-FROM
-    Stuga,
-    Stuga_Utrustning,
-    Stuga_Köksstandard
-WHERE
-    Stuga.id = 1 AND
-    Stuga.Stuga_utrustning_id = Stuga_utrustning.id AND
-    Stuga.Stuga_köksstandard_id = Stuga_köksstandard.id;";
-        $this->db->execute($sql);
-        $cottages = $this->db->fetchAll();
-
-        foreach ($cottages as $cottage) {
+        $skiis = $this->cottage->getJoinedAll();
+        dump($skiis);
+        foreach ($skiis as $cottage) {
           $cottageStr = "(" . $cottage->id
                              . ") adr.: " . $cottage->Adress
                              . " sover: " . $cottage->Bäddar
@@ -99,10 +88,10 @@ WHERE
                         'label'      => 'Välj prislista: ',
                         'options'  => $selectPriceLists,
             ],
-            'first_week' => [
+            'first_week' => array(
                         'type'        => 'week',
                         'label' => 'Välj startvecka.',
-            ],
+            ),
             'last_week' => [
                         'type'      => 'week',
                         'label'      => 'Välj slutvecka: ',
@@ -175,7 +164,7 @@ WHERE
                         'Bokning_faktura_id'=> $form->Value('invoice'),
                         'Kal_prislista_id'      => $form->Value('priceList'),
                         'Kal_period_id'         => $this->db->LastInsertId(),
-                        'Bokning_typ_id'      => 1,
+                        'Bokning_typ_id'      => 3,
                     ];
                     $this->db->insert($this->booking->table(), $bookingParams);
                     $res02 = $this->db->execute();

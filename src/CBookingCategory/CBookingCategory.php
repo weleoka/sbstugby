@@ -23,7 +23,7 @@ class CBookingCategory {
     /*
      * Gets category under specific id
      *
-     * @param id
+     * @param id, int.
      * @return string
      */
      public function getCategoryStr ($id) {

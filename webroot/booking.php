@@ -29,6 +29,12 @@ $acronym = isset($_SESSION['user']) ? $_SESSION['user']->acronym : 1;
     'use_fieldset'   => true,   // Wrap form fields within <fieldset>
     'legend'         => 'booking',   // Use legend for fieldset
 ];*/
+$criteria = [
+    'id'            =>  isset($_GET['id']) ? $_GET['id'] : null,
+    'category'  => isset($_GET['category']) ? $_GET['category'] : null,
+    'paid'         =>  null,
+    'customer' => isset($_GET['customer']) ? $_GET['customer'] : null,
+];
 
 if (is_numeric($category) && $category <= 3 && $category > 0) {
     if ($category == 1) {
@@ -42,7 +48,7 @@ if (is_numeric($category) && $category <= 3 && $category > 0) {
         $form = new CSkiiBooking($db, $tn);
     }
     $categoryStr = $bookingCategory->getCategoryStr($category);
-    $form->makeForm($category);
+    $form->makeForm($criteria);
     $formStr = $form->getHTML(); // ($formOptions);
 } else {
     $roo['title'] = "Kategorifel";

@@ -14,9 +14,11 @@ class CInvoice {
    * Constructor
    */
     public function __construct($db, $tn) {
-        $this->db = $db; // new CDatabase($dbCredentials);
+        $this->db = $db;
         $this->tn = $tn;
         $this->table = $this->tn['invoice'];
+
+        $this->person = new CPerson($db, $tn);
     }
 
 
@@ -34,6 +36,116 @@ class CInvoice {
         return $this->db->fetchAll();
      }
 
+    /*
+     * Search for invoices using criteria.
+     *
+     * @param object $criteria.
+     * @return array with resultset
+     */
+    public function find($criteria) {
+        $params = [];
+        $i = 0;
+        foreach($criteria AS $searchItem ) {
+            if (!is_null($searchItem)) {
+                $params[$i] = $searchItem;
+            }
+            $i++;
+        }
+
+        $sql = "
+SELECT
+    Bokning_faktura.id AS id,
+    Person.Namn AS Betalperson
+FROM
+    Bokning_faktura,
+    Person
+WHERE
+    Bokning_faktura.Betalperson_id = Person.id";
+
+        if (!is_null($criteria['id'])) {
+            $sql .= "\nAND Bokning.id = ?";
+        }
+        if (!is_null($criteria['paid'])) {
+            $sql .= "\nAND Bokning_faktura.betald != NULL";
+        }
+        if (!is_null($criteria['customer'])) {
+            $sql .= "\nAND Bokning_faktura.Betalperson_id = ?";
+        }
+
+        $this->db->execute($sql, $params);
+        $result = $this->db->fetchAll();
+
+        return $result;
+    }
+
+
+    /*
+     * Make form.
+     *
+     * @params
+     * @return void
+     */
+    public function makeForm () {
+
+        $persons = $this->person->getAll();
+        foreach ($persons as $person) {
+          $selectPersons[ $person->id ] = $person->Namn;
+        }
+
+        $this->form = new \Mos\HTMLForm\CForm([],[
+            'person01' => [
+                        'type'      => 'select',
+                        'label'      => 'Person 01: ',
+                        'options'  => $selectPersons,
+            ],
+            'submit' => [
+                'type'      => 'submit',
+                'class'     => 'bigButton',
+                'callback'  => function($form) {
+
+                    $sql = "START TRANSACTION;";
+                    $this->db->execute($sql);
+
+                    $invoiceParams = [
+                        'Person01'       => $form->Value('person01'),
+                    ];
+                    $this->db->insert($this->table, $invoiceParams);
+                    $res01 = $this->db->execute();
+
+                    if ($res01) {
+                        $sql = "COMMIT;";
+                        $res = $this->db->execute($sql);
+                        return true;
+                    } else {
+                        $sql = "ROLLBACK;";
+                        $res = $this->db->execute($sql);
+                        print("First: " . $res01);
+                        return false;
+                    }
+                }
+            ],
+        ]);
+
+        // Check the status of the form.
+        $status = $this->form->check();
+
+        if ($status === true) {
+            print('Bokningen genomfördes');
+
+        } else if ($status === false) {
+            print('Din bokning kunde inte genomföras.');
+        }
+    }
+
+
+    /*
+     * Get the HTML for the form.
+     *
+     * @return string with html to display content
+     */
+    public function getHTML () {
+        return $this->form->getHTML();
+    }
 
 
     /*
@@ -44,22 +156,5 @@ class CInvoice {
     public function table() {
         return $this->table;
     }
-/*     public function insertNewInvoice($params) {
-        $output = '';
-        $sql = "INSERT INTO {$this->tn['bookings']} (Faktura_id, Kal_prislista_id, Kal_period_id, Bokning_typ_id)
-                    VALUES (?, ?, ?, $categoryCode);";
-        $res = $this->db->ExecuteQuery($sql, $params);
-        if($res) {
-            $output = '... periodinformationen sparades.';
-        } else {
-            $output = '... periodinformationen sparades EJ.<br><pre>' . print_r($this->db->ErrorInfo(), 1) . '</pre>';
-        }
-        return $output;
-    }*/
-/*
-    foreach ($tags as $tag) {
-      $aaa[$tag->tag] = $tag->tag;
-    }
-*/
 
 }

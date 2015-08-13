@@ -1,9 +1,9 @@
 <?php
 /**
- * CCottageBooking, class that represents booking cottages.
+ * CBikeBooking, class that represents booking bikes.
  *
  */
-class CCottageBooking {
+class CBikeBooking {
 
     protected $table;
   /*
@@ -13,7 +13,7 @@ class CCottageBooking {
     public function __construct($db, $tn) {
             $this->db = $db;
             $this->tn = $tn;
-            $this->table = $this->tn['cottageBooking'];
+            $this->table = $this->tn['bikeBooking'];
 
 
             $this->person = new CPerson($db, $tn);
@@ -21,6 +21,7 @@ class CCottageBooking {
             $this->priceList = new CPriceList($db, $tn);
             $this->booking = new CBooking($db, $tn);
             $this->period = new CPeriod($db, $tn);
+            $this->cottage = new CCottage($db, $tn);
             $this->bookingCategory = new CBookingCategory($db, $tn);
             $this->calendar = new CCalendar($db, $tn);
     }
@@ -52,7 +53,7 @@ class CCottageBooking {
 
         $priceLists = $this->priceList->getAll();
         foreach ($priceLists as $priceList) {
-          $selectPriceLists[ $priceList->id ] = $priceList->Kal_prislistaStr;
+          $selectPriceLists[ $priceList->id ] = $priceList->Beskrivning;
         }
 
         $persons = $this->person->getAll();
@@ -64,28 +65,26 @@ class CCottageBooking {
         foreach ($weeks as $week) {
           $selectWeeks[ $week->id ] = $week->id;
         }*/
-
         $sql = "
 SELECT
-    *
+    cykel.id AS id,
+    cykel.storlek AS storlek,
+    cykel_typ.beskrivning AS beskrivning
 FROM
-    Stuga,
-    Stuga_Utrustning,
-    Stuga_Köksstandard
+    cykel,
+    cykel_typ
 WHERE
-    Stuga.id = 1 AND
-    Stuga.Stuga_utrustning_id = Stuga_utrustning.id AND
-    Stuga.Stuga_köksstandard_id = Stuga_köksstandard.id;";
-        $this->db->execute($sql);
-        $cottages = $this->db->fetchAll();
+    cykel.cykel_typ_id = cykel_typ.id;";
 
-        foreach ($cottages as $cottage) {
-          $cottageStr = "(" . $cottage->id
-                             . ") adr.: " . $cottage->Adress
-                             . " sover: " . $cottage->Bäddar
-                             . " utrstng.: " . $cottage->Stuga_utrustningStr
-                             . " kksndrd.: " . $cottage->Stuga_köksstandardStr;
-          $selectCottages[ $cottage->id ] = $cottageStr;
+        $this->db->execute($sql);
+        $bikes = $this->db->fetchAll();
+
+        foreach ($bikes as $bike) {
+          $bikeStr = "(" . $bike->id
+                             . ") " . $bike->beskrivning
+                             . " (" . $bike->storlek
+                             . " tum).";
+          $selectBikes[ $bike->id ] = $bikeStr;
         }
 
         $this->form = new \Mos\HTMLForm\CForm([],[
@@ -107,58 +106,25 @@ WHERE
                         'type'      => 'week',
                         'label'      => 'Välj slutvecka: ',
             ],
-            'cottage' => [
+            'person' => [
                         'type'      => 'select',
-                        'label'      => 'Välj stuga: ',
-                        'options'  => $selectCottages,
-            ],
-            'person01' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 01: ',
+                        'label'      => 'Person: ',
                         'options'  => $selectPersons,
             ],
-            'person02' => [
+            'helmet' => [
                         'type'      => 'select',
-                        'label'      => 'Person 02: ',
-                        'options'  => $selectPersons,
+                        'label'      => 'Välj hjälm: ',
+                        'options'  => $selectHelmets,
             ],
-            'person03' => [
+            'bike' => [
                         'type'      => 'select',
-                        'label'      => 'Person 03: ',
-                        'options'  => $selectPersons,
-            ],
-            'person04' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 04: ',
-                        'options'  => $selectPersons,
-            ],
-            'person05' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 05: ',
-                        'options'  => $selectPersons,
-            ],
-            'person06' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 06: ',
-                        'options'  => $selectPersons,
-            ],
-            'person07' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 07: ',
-                        'options'  => $selectPersons,
-            ],
-            'person08' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 08: ',
-                        'options'  => $selectPersons,
+                        'label'      => 'Välj cykel: ',
+                        'options'  => $selectBikes,
             ],
             'submit' => [
                 'type'      => 'submit',
                 'class'     => 'bigButton',
                 'callback'  => function($form) {
-
-                    // PDO::beginTransaction()
-                    // 'timestamp'     => getTime(),
 
                     $sql = "START TRANSACTION;";
                     $this->db->execute($sql);
@@ -175,22 +141,16 @@ WHERE
                         'Bokning_faktura_id'=> $form->Value('invoice'),
                         'Kal_prislista_id'      => $form->Value('priceList'),
                         'Kal_period_id'         => $this->db->LastInsertId(),
-                        'Bokning_typ_id'      => 1,
+                        'Bokning_typ_id'      => 2,
                     ];
                     $this->db->insert($this->booking->table(), $bookingParams);
                     $res02 = $this->db->execute();
 
-                    $cottageBookingParams = [
+                    $bikeBookingParams = [
                         'Bokning_id'     => $this->db->LastInsertId(),
-                        'Stuga_id'        => $form->Value('cottage'),
-                        'Person01'       => $form->Value('person01'),
-                        'Person02'       => $form->Value('person02'),
-                        'Person03'       => $form->Value('person03'),
-                        'Person04'       => $form->Value('person04'),
-                        'Person05'       => $form->Value('person05'),
-                        'Person06'       => $form->Value('person06'),
-                        'Person07'       => $form->Value('person07'),
-                        'Person08'       => $form->Value('person08'),
+                        'Person_id'       => $form->Value('person'),
+                        'Cykel_hjälm_id'=> $form->Value('helmet'),
+                        'Cykel_id'        => $form->Value('bike'),
                     ];
                     $this->db->insert($this->table, $cottageBookingParams);
                     $res03 = $this->db->execute();
