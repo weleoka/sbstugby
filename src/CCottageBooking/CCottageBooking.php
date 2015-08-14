@@ -25,6 +25,31 @@ class CCottageBooking {
             $this->calendar = new CCalendar($db, $tn);
     }
 
+    /*
+     * Find cottages
+     *
+     * @return array of objects.
+     */
+    public function findAllCottages () {
+        $sql = "
+SELECT
+    Stuga.id,
+    Stuga.Adress,
+    Stuga.Bäddar,
+    Stuga.Rum,
+    Stuga_utrustning.Beskrivning AS Utrustning,
+    Stuga_köksstandard.Beskrivning AS Köksstandard
+FROM
+    Stuga,
+    Stuga_Utrustning,
+    Stuga_Köksstandard
+WHERE
+    Stuga.Stuga_utrustning_id = Stuga_utrustning.id AND
+    Stuga.Stuga_köksstandard_id = Stuga_köksstandard.id;";
+        $this->db->execute($sql);
+        return $this->db->fetchAll();
+    }
+
 
 
     /*
@@ -50,9 +75,9 @@ class CCottageBooking {
           $selectInvoices[ $invoice->id ] = $invoice->id . ": " . $invoice->Betalperson;
         }
 
-        $priceLists = $this->priceList->getAll();
+        $priceLists = $this->priceList->getActive();
         foreach ($priceLists as $priceList) {
-          $selectPriceLists[ $priceList->id ] = $priceList->Kal_prislistaStr;
+          $selectPriceLists[ $priceList->id ] = $priceList->Beskrivning;
         }
 
         $persons = $this->person->getAll();
@@ -60,33 +85,22 @@ class CCottageBooking {
           $selectPersons[ $person->id ] = $person->Namn;
         }
 
-/*        $weeks = $this->calendar->getAllWeeks();
+        $weeks = $this->calendar->getAllWeeks();
         foreach ($weeks as $week) {
           $selectWeeks[ $week->id ] = $week->id;
-        }*/
+        }
 
-        $sql = "
-SELECT
-    *
-FROM
-    Stuga,
-    Stuga_Utrustning,
-    Stuga_Köksstandard
-WHERE
-    Stuga.id = 1 AND
-    Stuga.Stuga_utrustning_id = Stuga_utrustning.id AND
-    Stuga.Stuga_köksstandard_id = Stuga_köksstandard.id;";
-        $this->db->execute($sql);
-        $cottages = $this->db->fetchAll();
 
+        $cottages = $this->findAllCottages();
         foreach ($cottages as $cottage) {
           $cottageStr = "(" . $cottage->id
                              . ") adr.: " . $cottage->Adress
                              . " sover: " . $cottage->Bäddar
-                             . " utrstng.: " . $cottage->Stuga_utrustningStr
-                             . " kksndrd.: " . $cottage->Stuga_köksstandardStr;
+                             . " utrstng.: " . $cottage->Utrustning
+                             . " kksndrd.: " . $cottage->Köksstandard;
           $selectCottages[ $cottage->id ] = $cottageStr;
         }
+
 
         $this->form = new \Mos\HTMLForm\CForm([],[
             'invoice' => [
@@ -99,13 +113,15 @@ WHERE
                         'label'      => 'Välj prislista: ',
                         'options'  => $selectPriceLists,
             ],
-            'first_week' => [
-                        'type'        => 'week',
-                        'label' => 'Välj startvecka.',
+            'start_week' => [
+                        'type'      => 'select',
+                        'label'      => 'Välj startvecka.',
+                        'options'   => $selectWeeks,
             ],
-            'last_week' => [
-                        'type'      => 'week',
+            'end_week' => [
+                        'type'      => 'select',
                         'label'      => 'Välj slutvecka: ',
+                        'options'   => $selectWeeks,
             ],
             'cottage' => [
                         'type'      => 'select',
@@ -164,8 +180,8 @@ WHERE
                     $this->db->execute($sql);
 
                     $periodParams = [
-                        'Vecka_start'      => $form->Value('first_week'), // HTML 5 gives format like this: 2015-W51
-                        'Vecka_slut'        => $form->Value('last_week'),   // Need to alter table to store that
+                        'Vecka_start'      => $form->Value('start_week'), // HTML 5 gives format like this: 2015-W51
+                        'Vecka_slut'        => $form->Value('end_week'),   // Need to alter table to store that
                                                                                                 // and write method to substr() it for price calcs.
                     ];
                     $this->db->insert($this->period->table(), $periodParams);
@@ -175,7 +191,7 @@ WHERE
                         'Bokning_faktura_id'=> $form->Value('invoice'),
                         'Kal_prislista_id'      => $form->Value('priceList'),
                         'Kal_period_id'         => $this->db->LastInsertId(),
-                        'Bokning_typ_id'      => 1,
+                        'Bokning_typ_id'      => 1, // The cottage booking category is 1.
                     ];
                     $this->db->insert($this->booking->table(), $bookingParams);
                     $res02 = $this->db->execute();

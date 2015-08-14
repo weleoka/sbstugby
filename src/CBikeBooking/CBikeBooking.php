@@ -21,7 +21,7 @@ class CBikeBooking {
             $this->priceList = new CPriceList($db, $tn);
             $this->booking = new CBooking($db, $tn);
             $this->period = new CPeriod($db, $tn);
-            $this->cottage = new CCottage($db, $tn);
+
             $this->bookingCategory = new CBookingCategory($db, $tn);
             $this->calendar = new CCalendar($db, $tn);
     }
@@ -51,7 +51,7 @@ class CBikeBooking {
           $selectInvoices[ $invoice->id ] = $invoice->id . ": " . $invoice->Betalperson;
         }
 
-        $priceLists = $this->priceList->getAll();
+        $priceLists = $this->priceList->getActive();
         foreach ($priceLists as $priceList) {
           $selectPriceLists[ $priceList->id ] = $priceList->Beskrivning;
         }
@@ -61,10 +61,11 @@ class CBikeBooking {
           $selectPersons[ $person->id ] = $person->Namn;
         }
 
-/*        $weeks = $this->calendar->getAllWeeks();
+        $weeks = $this->calendar->getAllWeeks();
         foreach ($weeks as $week) {
           $selectWeeks[ $week->id ] = $week->id;
-        }*/
+        }
+
         $sql = "
 SELECT
     cykel.id AS id,
@@ -75,7 +76,6 @@ FROM
     cykel_typ
 WHERE
     cykel.cykel_typ_id = cykel_typ.id;";
-
         $this->db->execute($sql);
         $bikes = $this->db->fetchAll();
 
@@ -86,6 +86,24 @@ WHERE
                              . " tum).";
           $selectBikes[ $bike->id ] = $bikeStr;
         }
+
+        $sql = "
+SELECT
+    cykel_hjälm.id AS id,
+    cykel_hjälm.storlek AS storlek
+FROM
+    cykel_hjälm;";
+        $this->db->execute($sql);
+        $helmets = $this->db->fetchAll();
+
+        foreach ($helmets as $helmet) {
+          $helmetStr = "(" . $helmet->id
+                             . " (" . $helmet->storlek
+                             . " tum).";
+          $selectHelmets[ $helmet->id ] = $helmetStr;
+        }
+
+
 
         $this->form = new \Mos\HTMLForm\CForm([],[
             'invoice' => [
@@ -98,13 +116,15 @@ WHERE
                         'label'      => 'Välj prislista: ',
                         'options'  => $selectPriceLists,
             ],
-            'first_week' => [
-                        'type'        => 'week',
-                        'label' => 'Välj startvecka.',
+            'start_week' => [
+                        'type'      => 'select',
+                        'label'      => 'Välj startvecka.',
+                        'options'   => $selectWeeks,
             ],
-            'last_week' => [
-                        'type'      => 'week',
+            'end_week' => [
+                        'type'      => 'select',
                         'label'      => 'Välj slutvecka: ',
+                        'options'   => $selectWeeks,
             ],
             'person' => [
                         'type'      => 'select',
@@ -130,8 +150,8 @@ WHERE
                     $this->db->execute($sql);
 
                     $periodParams = [
-                        'Vecka_start'      => $form->Value('first_week'), // HTML 5 gives format like this: 2015-W51
-                        'Vecka_slut'        => $form->Value('last_week'),   // Need to alter table to store that
+                        'Vecka_start'      => $form->Value('start_week'), // HTML 5 gives format like this: 2015-W51
+                        'Vecka_slut'        => $form->Value('end_week'),   // Need to alter table to store that
                                                                                                 // and write method to substr() it for price calcs.
                     ];
                     $this->db->insert($this->period->table(), $periodParams);
@@ -152,7 +172,7 @@ WHERE
                         'Cykel_hjälm_id'=> $form->Value('helmet'),
                         'Cykel_id'        => $form->Value('bike'),
                     ];
-                    $this->db->insert($this->table, $cottageBookingParams);
+                    $this->db->insert($this->table, $bikeBookingParams);
                     $res03 = $this->db->execute();
 
                     if ($res01 && $res02 && $res03) {

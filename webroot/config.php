@@ -90,7 +90,8 @@ $roo['navbar'] = array(
 	'class' => 'nb-plain',
 	'items' => array(
 		'home' => array('text'=>'SB Hem', 'url'=>'index.php', 'title'=>'SB semesterbyar'),
-		'bookings' => array('text'=>'Bokningar', 'url'=>'view.php', 'title'=>'Bokningar'),
+		'bookings' => array('text'=>'Bokningar', 'url'=>'view_bookings.php', 'title'=>'Bokningar'),
+		'invoices' => array('text'=>'Fakturor', 'url'=>'view_invoices.php', 'title'=>'Fakturor'),
 		'01' => array('text'=>'Stuga', 'url'=>'booking.php?category=1', 'title'=>'Boka stuga'),
 		'02' => array('text'=>'Cykel', 'url'=>'booking.php?category=2', 'title'=>'Boka cykel'),
 		'03' => array('text'=>'Skidor', 'url'=>'booking.php?category=3', 'title'=>'Boka skidor'),

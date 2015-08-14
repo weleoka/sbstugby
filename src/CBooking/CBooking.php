@@ -205,7 +205,7 @@ SELECT
     Bokning.id,
     Kal_period.Vecka_start,
     Kal_period.Vecka_slut,
-    Kal_prislista.Kal_prislistaStr AS Prislista,
+    Kal_prislista.Beskrivning AS Prislista,
     Person.Namn AS Betalperson
 FROM
     Bokning,

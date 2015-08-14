@@ -34,6 +34,26 @@ class CPriceList {
 
 
     /*
+     * Gets active price lists.
+     *
+     * @return object
+     */
+     public function getActive () {
+        $sql = "
+SELECT
+    *
+FROM
+    {$this->table}
+WHERE
+    Aktiv = true;";
+
+        $this->db->execute($sql);
+
+        return $this->db->fetchAll();
+     }
+
+
+    /*
      * Method that returns table name.
      *
      * @return string $this->table.

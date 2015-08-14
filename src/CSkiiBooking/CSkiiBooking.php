@@ -21,7 +21,7 @@ class CSkiiBooking {
             $this->priceList = new CPriceList($db, $tn);
             $this->booking = new CBooking($db, $tn);
             $this->period = new CPeriod($db, $tn);
-            $this->cottage = new CCottage($db, $tn);
+
             $this->bookingCategory = new CBookingCategory($db, $tn);
             $this->calendar = new CCalendar($db, $tn);
     }
@@ -51,9 +51,9 @@ class CSkiiBooking {
           $selectInvoices[ $invoice->id ] = $invoice->id . ": " . $invoice->Betalperson;
         }
 
-        $priceLists = $this->priceList->getAll();
+        $priceLists = $this->priceList->getActive();
         foreach ($priceLists as $priceList) {
-          $selectPriceLists[ $priceList->id ] = $priceList->Kal_prislistaStr;
+          $selectPriceLists[ $priceList->id ] = $priceList->Beskrivning;
         }
 
         $persons = $this->person->getAll();
@@ -61,20 +61,61 @@ class CSkiiBooking {
           $selectPersons[ $person->id ] = $person->Namn;
         }
 
-/*        $weeks = $this->calendar->getAllWeeks();
+        $weeks = $this->calendar->getAllWeeks();
         foreach ($weeks as $week) {
           $selectWeeks[ $week->id ] = $week->id;
-        }*/
+        }
 
-        $skiis = $this->cottage->getJoinedAll();
-        dump($skiis);
-        foreach ($skiis as $cottage) {
-          $cottageStr = "(" . $cottage->id
-                             . ") adr.: " . $cottage->Adress
-                             . " sover: " . $cottage->Bäddar
-                             . " utrstng.: " . $cottage->Stuga_utrustningStr
-                             . " kksndrd.: " . $cottage->Stuga_köksstandardStr;
-          $selectCottages[ $cottage->id ] = $cottageStr;
+        $sql = "
+SELECT
+    skidor.id AS id,
+    skidor.Storlek AS storlek,
+    skid_typ.Beskrivning AS beskrivning
+FROM
+    skidor,
+    skid_typ
+WHERE
+    skidor.skid_typ_id = skid_typ.id;";
+        $this->db->execute($sql);
+        $skiisets = $this->db->fetchAll();
+
+        foreach ($skiisets as $skiiset) {
+          $skiisetStr = "(" . $skiiset->id
+                             . ") " . $skiiset->beskrivning
+                             . " (" . $skiiset->storlek
+                             . " tum).";
+          $selectSkiisets[ $skiiset->id ] = $skiisetStr;
+        }
+
+
+        $sql = "
+SELECT
+    skid_hjälm.id AS id,
+    skid_hjälm.storlek AS storlek
+FROM
+    skid_hjälm;";
+        $this->db->execute($sql);
+        $helmets = $this->db->fetchAll();
+        foreach ($helmets as $helmet) {
+          $helmetStr = "(" . $helmet->id
+                             . ") " . $helmet->storlek
+                             . " tum.";
+          $selectHelmets[ $helmet->id ] = $helmetStr;
+        }
+
+        $sql = "
+SELECT
+    skid_stav.id AS id,
+    skid_stav.storlek AS storlek
+FROM
+    skid_stav;";
+        $this->db->execute($sql);
+        $skiipoles = $this->db->fetchAll();
+        foreach ($skiipoles as $skiipole) {
+          $skiipoleStr = "(" . $skiipole->id
+                             . ") " . $skiipole->storlek
+                             . " tum.";
+          $selectSkiipoles[ $skiipole->id ] = $skiipoleStr;
         }
 
         $this->form = new \Mos\HTMLForm\CForm([],[
@@ -88,57 +129,34 @@ class CSkiiBooking {
                         'label'      => 'Välj prislista: ',
                         'options'  => $selectPriceLists,
             ],
-            'first_week' => array(
-                        'type'        => 'week',
-                        'label' => 'Välj startvecka.',
-            ),
-            'last_week' => [
-                        'type'      => 'week',
+            'start_week' => [
+                        'type'      => 'select',
+                        'label'      => 'Välj startvecka.',
+                        'options'   => $selectWeeks,
+            ],
+            'end_week' => [
+                        'type'      => 'select',
                         'label'      => 'Välj slutvecka: ',
+                        'options'   => $selectWeeks,
             ],
-            'cottage' => [
+            'skiiset' => [
                         'type'      => 'select',
-                        'label'      => 'Välj stuga: ',
-                        'options'  => $selectCottages,
+                        'label'      => 'Välj skidor: ',
+                        'options'  => $selectSkiisets,
             ],
-            'person01' => [
+            'helmet' => [
                         'type'      => 'select',
-                        'label'      => 'Person 01: ',
-                        'options'  => $selectPersons,
+                        'label'      => 'Välj hjälm: ',
+                        'options'  => $selectHelmets,
             ],
-            'person02' => [
+            'skiipole' => [
                         'type'      => 'select',
-                        'label'      => 'Person 02: ',
-                        'options'  => $selectPersons,
+                        'label'      => 'Välj skidstavar: ',
+                        'options'  => $selectSkiipoles,
             ],
-            'person03' => [
+            'person' => [
                         'type'      => 'select',
-                        'label'      => 'Person 03: ',
-                        'options'  => $selectPersons,
-            ],
-            'person04' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 04: ',
-                        'options'  => $selectPersons,
-            ],
-            'person05' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 05: ',
-                        'options'  => $selectPersons,
-            ],
-            'person06' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 06: ',
-                        'options'  => $selectPersons,
-            ],
-            'person07' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 07: ',
-                        'options'  => $selectPersons,
-            ],
-            'person08' => [
-                        'type'      => 'select',
-                        'label'      => 'Person 08: ',
+                        'label'      => 'Person: ',
                         'options'  => $selectPersons,
             ],
             'submit' => [
@@ -153,8 +171,8 @@ class CSkiiBooking {
                     $this->db->execute($sql);
 
                     $periodParams = [
-                        'Vecka_start'      => $form->Value('first_week'), // HTML 5 gives format like this: 2015-W51
-                        'Vecka_slut'        => $form->Value('last_week'),   // Need to alter table to store that
+                        'Vecka_start'      => $form->Value('start_week'), // HTML 5 gives format like this: 2015-W51
+                        'Vecka_slut'        => $form->Value('end_week'),   // Need to alter table to store that
                                                                                                 // and write method to substr() it for price calcs.
                     ];
                     $this->db->insert($this->period->table(), $periodParams);
@@ -164,24 +182,19 @@ class CSkiiBooking {
                         'Bokning_faktura_id'=> $form->Value('invoice'),
                         'Kal_prislista_id'      => $form->Value('priceList'),
                         'Kal_period_id'         => $this->db->LastInsertId(),
-                        'Bokning_typ_id'      => 3,
+                        'Bokning_typ_id'      => 3, // The category code of skii-bookings is 3.
                     ];
                     $this->db->insert($this->booking->table(), $bookingParams);
                     $res02 = $this->db->execute();
 
-                    $cottageBookingParams = [
+                    $skiiBookingParams = [
                         'Bokning_id'     => $this->db->LastInsertId(),
-                        'Stuga_id'        => $form->Value('cottage'),
-                        'Person01'       => $form->Value('person01'),
-                        'Person02'       => $form->Value('person02'),
-                        'Person03'       => $form->Value('person03'),
-                        'Person04'       => $form->Value('person04'),
-                        'Person05'       => $form->Value('person05'),
-                        'Person06'       => $form->Value('person06'),
-                        'Person07'       => $form->Value('person07'),
-                        'Person08'       => $form->Value('person08'),
+                        'Skidor_id'        => $form->Value('skiiset'),
+                        'Person_id'            => $form->Value('person'),
+                        'Skid_stav_id'    => $form->Value('skiipole'),
+                        'Skid_hjälm_id'  => $form->Value('helmet'),
                     ];
-                    $this->db->insert($this->table, $cottageBookingParams);
+                    $this->db->insert($this->table, $skiiBookingParams);
                     $res03 = $this->db->execute();
 
                     if ($res01 && $res02 && $res03) {
