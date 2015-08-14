@@ -36,6 +36,7 @@ class CInvoice {
         return $this->db->fetchAll();
      }
 
+
     /*
      * Search for invoices using criteria.
      *
@@ -55,12 +56,20 @@ class CInvoice {
         $sql = "
 SELECT
     Bokning_faktura.id AS id,
-    Person.Namn AS Betalperson
+    Person.Namn AS Betalperson,
+    Kal_period.startvecka AS startvecka,
+    Kal_period.slutvecka AS slutvecka
 FROM
     Bokning_faktura,
     Person
+    Bokning,
+    Kal_period,
+    Kal_prislista
 WHERE
-    Bokning_faktura.Betalperson_id = Person.id";
+    Bokning_faktura.Betalperson_id = Person.id,
+    Bokning.Bokning_faktura_id = Bokning_faktura.id,
+    Bokning.Kal_period_id = Kal_period.id,
+    Bokning.Kal_prislista_id = Kal_prislista.id";
 
         if (!is_null($criteria['id'])) {
             $sql .= "\nAND Bokning.id = ?";
@@ -76,6 +85,31 @@ WHERE
         $result = $this->db->fetchAll();
 
         return $result;
+    }
+
+
+    /*
+     * List resultset in HTML.
+     *
+     * @param $result the resultset from db query.
+     * @return string with html to display content
+     */
+    public function listInvoices($result) {
+        $listHTML = "";
+
+        foreach($result AS $key => $val) {
+            $listHTML .= "<li>";
+            $listHTML .= $val->id . ": ";
+            $listHTML .= $val->Vecka_start . " (Startvecka), ";
+            $listHTML .= $val->Vecka_slut . " (Slutvecka), ";
+            $listHTML .= $val->Prislista . ", ";
+            $listHTML .= $val->Betalperson . ".";
+            $listHTML .= " ( ";
+            $listHTML .= "<a href=\"delete.php?id=$val->id\"> Ta bort</a> )";
+            $listHTML .= "</li>";
+        }
+
+        return $listHTML;
     }
 
 

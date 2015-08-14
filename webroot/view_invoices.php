@@ -4,7 +4,7 @@
 include(__DIR__.'/config.php');
 
 // Save variablers in Roo container
-$roo['title'] = "Visa bokningar";
+$roo['title'] = "Visa fakturor";
 
 $db = new \Mos\Database\CDatabaseBasic();
 $db->setOptions($roo['database']);
@@ -20,50 +20,22 @@ $bookingCategory = new CBookingCategory($db, $tn);
 
 $criteria = [
     'id'            =>  isset($_GET['id']) ? $_GET['id'] : null,
-    'category'  => isset($_GET['category']) ? $_GET['category'] : null,
     'paid'         =>  isset($_GET['paid']) ? $_GET['paid'] : null,
     'customer' => isset($_GET['customer']) ? $_GET['customer'] : null,
 ];
 
-$html = "<h1>Bokningshanteraren</h1>";
+$html = "<h1>Fakturahanteraren</h1>";
 
-// Make the header name of category.
-if (is_numeric($criteria['category'])){
-    // Make relevant header.
-    $html .= "<h1>" . $bookingCategory->getCategoryStr($criteria['category']) . "ar</h1>"; // Append "ar" for plural.
-    // query db for bookings.
-    $searchedResult = $bookings->findBookings($criteria);
-    // Make html from the resutset.
-    $html .= $bookings->listSearchedBookings($searchedResult);
-
-} else {
-    for ($i = 1; $i <= 3; $i++) {
-        $criteria['category'] = $i;
-        // Make relevant header.
-        $html .= "<h1>" . $bookingCategory->getCategoryStr($criteria['category']) . "ar</h1>"; // Append "ar" for plural.
-        // query db for bookings.
-        $searchedResult = $bookings->findBookings($criteria);
-        // List resultset.
-        $html .= $bookings->listSearchedBookings($searchedResult);
-    }
-}
-
-/*if (is_null($criteria['category'])) {
-    $html = $bookings->getAllBookings();
-    $categoryStr = "Alla bokningar";
-
-} */
-
+$searchedResult = $invoices->find($criteria);
+// List resultset.
+$html .= $invoices->listInvoices($searchedResult);
 
 
 $roo['header'] .= '<span class="siteslogan">Aktuella bokningar</span>';
 
 $roo['main'] = <<<EOD
 <article>
-    <a href='view.php?category=1'>Stuga</a> 
-    <a href='view.php?category=2'>Cykel</a> 
-    <a href='view.php?category=3'>Skidor</a> 
-    <a href='view.php'>Alla</a> 
+    <a href='view_invoices.php?paid=1'>Paid Invoices</a>
     <ul>
         {$html}
     </ul>
